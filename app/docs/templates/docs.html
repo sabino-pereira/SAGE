@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Page Heading and subtitle -->
+    <div class="p-3 mb-5 border rounded-3 text-center">
+        <div>
+            <h1 class="display-4 fw-bold">SAGE Documentation</h1>
+            <p class="fs-4 text-muted">Welcome to the central documentation hub for this application.</p>
+        </div>
+    </div>
+
+    <!-- Top Documentation Links -->
+    <div class="row g-2">
+        <!-- Getting started Card -->
+        <div class="col-6">
+            <a href="{{ url_for('docs.getting_started') }}" class="card-link text-decoration-none">
+                <div class="card h-100 text-center shadow-sm p-3 custom-docs-card">
+                    <div class="card-body">
+                        <span class="bi bi-book card-icon text-primary custom-docs-icon"></span>
+                        <h5 class="card-title">Getting Started</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Core Features Card -->
+        <div class="col-6">
+            <a href="{{ url_for('docs.core') }}" class="card-link text-decoration-none">
+                <div class="card h-100 text-center shadow-sm p-3 custom-docs-card">
+                    <div class="card-body">                      
+                        <span class="bi bi-hdd-stack card-icon text-primary custom-docs-icon"></span>
+                        <h5 class="card-title">Core Features</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+
+    <!-- Bottom Documentation Links -->
+    <div class="row g-4 mt-4">
+        <div class="col-12 col-md-4">
+            <a href="{{ url_for('docs.api') }}" class="card-link text-decoration-none">
+                <div class="card h-100 text-center shadow-sm p-3 custom-docs-card">
+                    <div class="card-body">               
+                        <span class="bi bi-code-slash card-icon text-primary custom-docs-icon"></span>
+                        <h5 class="card-title">APIs</h5>
+                        <p class="card-text text-muted">Explains how to use the various 'API' tools and integrations.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a href="{{ url_for('docs.monitoring') }}" class="card-link text-decoration-none">
+                <div class="card h-100 text-center shadow-sm p-3 custom-docs-card">
+                    <div class="card-body">
+                        <span class="bi bi-diagram-3 card-icon text-primary custom-docs-icon"></span>
+                        <h5 class="card-title">Monitoring</h5>
+                        <p class="card-text text-muted">Explains how to use the tools from the 'Monitoring' section.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a href="{{ url_for('docs.tools') }}" class="card-link text-decoration-none">
+                <div class="card h-100 text-center shadow-sm p-3 custom-docs-card">
+                    <div class="card-body">                     
+                        <span class="bi bi-terminal card-icon text-primary custom-docs-icon"></span>
+                        <h5 class="card-title">Developer Tools</h5>
+                        <p class="card-text text-muted">Reference guide on using the various tools</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+    <div class="container-fluid">
+        
+        <!-- Main Page Header -->
+        <div class="justify-content-center d-flex border-bottom mt-2 mb-3">
+            <h2>REST API Interface</h2>  
+            <a href="{{url_for('docs.api', _anchor='rest-api')}}" class="link-underline-primary ms-1"><i class="small bi bi-info-square"></i></a>
+        </div>
+
+        <!-- Whole page is the main rest api form, with each section being a separate submit button. -->
+        <form action="" method="post" class="text-center" novalidate>
+            {{ form.hidden_tag() }}
+            
+            <!--Configuration Accordion-->
+            <div class="mb-3">
+                {{ macroTemplate.api_configuration_accordion(form) }}
+            </div>
+
+            
+            <!-- Toggle Sidebar Button -->
+            <div class="d-flex justify-content-center mb-2">
+                <button class="btn btn-outline-primary shadow-sm" type="button" onclick="toggleConsoleSidebar()" id="sidebarToggleBtn">
+                    <i class="bi bi-layout-sidebar-inset" id="sidebarToggleIcon"></i> <span class="ms-1">Show/Hide REST API Config</span>
+                </button>
+            </div>
+
+
+            <!-- Input and Output Elements -->
+            <div class="row mt-4">
+                
+                <!-- Input query element -->
+                <div class="col-12 col-lg-6 mb-4" id="api-input-toggle">
+                    <div class="card border border-primary">
+                        <!-- Header with title -->
+                        <div class="card-header text-bg-primary">
+                            REST API Config
+                        </div>
+                        
+                        <!-- Footer Class at top with Buttons -->
+                        <div class="card-footer">
+                            <div class="row p-2">
+                                <!-- Run Query Button, submits graphql query -->
+                                <div class="col-6 mx-auto">
+                                    <button type="submit" class="btn btn-success w-100" onclick="showLoadingIcon('rest-api-output-container')"><i class="bi bi-play-fill"></i> Execute</button>
+                                </div>
+                            </div>                            
+                        </div>
+
+                        <!-- Body -->
+                        <div class="card-body p-2">
+                            <div class="row">
+                                <div class="col-12 col-md-6 mt-2">
+                                    {{ macroTemplate.form_dropdown(form.request_type, context=form.request_type.label)}}
+                                </div>
+                                <div class="col-12 col-md-6 mt-2">
+                                    {{ macroTemplate.form_dropdown(form.request_endpoint, context=form.request_endpoint.label)}}
+                                </div>                                
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 col-md-6 mt-3">
+                                    {{ macroTemplate.form_dropdown(form.request_category, context=form.request_category.label)}}
+                                </div>
+                                <div class="col-12 col-md-6 mt-3">
+                                    {{ macroTemplate.form_dropdown(form.request_path, context=form.request_path.label)}}
+                                </div>                                                     
+                            </div>
+
+                            <!-- Dynamic Path Parameter Inputs -->
+                            <div id="dynamic-path-inputs" class="row"></div>
+
+                            <div class="row">
+                                <div class="col-12 mt-3 d-none" id="request-body-container">
+                                    {{ macroTemplate.form_field(form.request_body)}}
+                                </div>                                                   
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Output element -->
+                <div class="col-12 col-lg-6 mb-4" id="output-element-container-2">
+                    <div class="card border border-primary h-100">
+                        <!-- Header with title -->
+                        <div class="card-header text-bg-primary">
+                            Output
+                        </div>
+                    
+                        <div class="card-body" id="rest-api-output-container">
+                            {% if return_dictionary %}
+                                <div class="row mt-2">
+                                    <!-- Output Header -->                                   
+                                    <h4 class="col-12 col-lg-8 text-center text-lg-start fst-italic text-muted">
+                                        {{ return_dictionary["header"]|safe }}  
+                                    </h4>
+
+                                    <div class="col-12 col-lg-4 text-center text-lg-end"> 
+                                        <!-- Clear Page Button -->
+                                        <a type="button" class="btn btn-danger btn-sm" href="{{url_for('api.clear_api')}}"><i class="bi bi-x-circle"></i> Clear</a>
+                                        
+                                        <!-- Copy Output Button -->
+                                        {{macroTemplate.copy_text_button("rest-api-output-details") }} 
+                                    </div>
+                                </div>
+                                
+                                <hr>
+                                
+                                <!-- Output Data -->
+                                {% if return_dictionary["error"] %}
+                                    {{ return_dictionary["data"] }}
+                                {% else %}
+                                    <pre class="text-start" id="rest-api-output-details">{{ return_dictionary["data"] }}</pre>
+                                {% endif %}
+                                
+                            {% else %}
+                                <!-- Default Data -->
+                                <p class="fst-italic text-muted">Output will be printed here...</p>
+                            {% endif %}
+
+                            {{return_value}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+        </form>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        
+
+        // This block auto-opens REST API Configuration Accordion when an error is detected in the form
+        var formErrorElements = document.getElementsByClassName("is-invalid");
+        var openAccordion = false;
+
+        // Only open accordion if form error element is not request_body, which is not in accordion
+        for (const element of formErrorElements) {
+            if (element.id != "request_body") {
+                openAccordion = true;
+            }
+        }
+        
+        if(openAccordion){            
+            const myAccordion = document.getElementById('collapseInputs');
+            const bsCollapse = new bootstrap.Collapse(myAccordion, {
+                toggle: false
+            });
+            bsCollapse.show();
+        }
+
+
+        // Show/hide body element based on request type selected
+        const requestBody = document.getElementById('request_body');
+        const requestBodyContainer = document.getElementById('request-body-container');
+        const requestType = document.getElementById('request_type');
+        if(requestType && requestBody) {
+            function toggleBody() {
+                const selectedType = requestType.value;
+
+                if (selectedType == "post" || selectedType == "put" || selectedType == "patch") {
+                    requestBodyContainer.classList.remove("d-none")
+                    requestBodyContainer.classList.add("d-block")
+                }
+                else {
+                    requestBodyContainer.classList.add("d-none")
+                    requestBodyContainer.classList.remove("d-block")
+                }
+            }
+            
+            // Initialize and add listener
+            toggleBody()
+            requestType.addEventListener('change', toggleBody);
+        }
+
+        
+
+
+        // Dynamic filtering for request_path based on request_category
+        const requestCategory = document.getElementById('request_category');
+        const requestPath = document.getElementById('request_path');
+        const dynamicInputsContainer = document.getElementById('dynamic-path-inputs');
+        const serverDynamicValues = {{ dynamic_values|default({})|tojson }};
+        const formErrors = {{ form.errors|tojson }};
+        
+        if (requestCategory && requestPath) {
+            // Store all original options
+            const allPathOptions = Array.from(requestPath.options);          
+            
+            function updateDynamicInputs() {
+                if (!dynamicInputsContainer) return;
+                
+                const path = requestPath.value;
+                dynamicInputsContainer.innerHTML = ''; // Clear existing
+
+                // Regex to find {variable}
+                const regex = /{([^}]+)}/g;
+                let match;
+                
+                while ((match = regex.exec(path)) !== null) {
+                    const varName = match[1]; 
+                    
+                    // Create column div
+                    const col = document.createElement('div');
+                    col.className = 'col-12 col-md-6 mt-3'; 
+                    
+                    // Create label
+                    const label = document.createElement('label');
+                    label.className = 'form-text';
+                    label.innerText = varName.charAt(0).toUpperCase() + varName.slice(1); 
+                    label.htmlFor = 'dynamic_input_' + varName;
+                    
+                    // Create input
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'form-control';
+                    input.id = 'dynamic_input_' + varName;
+                    input.name = varName; 
+                    input.placeholder = `Enter ${varName}`;
+                    
+                    if (serverDynamicValues && serverDynamicValues[varName]) {
+                        input.value = serverDynamicValues[varName];
+                    }
+                    
+                    col.appendChild(input);
+                    col.appendChild(label);
+
+                    if (formErrors && formErrors[varName]) {
+                        input.classList.add('is-invalid');
+                        const errorSpan = document.createElement('div');
+                        errorSpan.className = 'invalid-feedback';
+                        errorSpan.innerText = formErrors[varName].join(', ');
+                        col.appendChild(errorSpan);
+                    }
+
+                    dynamicInputsContainer.appendChild(col);
+                }
+            }
+            
+            function filterPaths() {
+                const selectedCategory = requestCategory.value;
+                const currentPath = requestPath.value;
+                
+                // Clear current options
+                requestPath.innerHTML = '';
+
+                // Filter and append options that match the category
+                let firstOption = null;
+                let matchFound = false;
+
+                allPathOptions.forEach(option => {
+                    if (!selectedCategory || option.value.startsWith(selectedCategory)) {
+                        requestPath.appendChild(option);
+                        
+                        if (!firstOption) firstOption = option.value;
+                        if (option.value === currentPath) matchFound = true;
+                    }
+                });
+
+                if (matchFound) {
+                    requestPath.value = currentPath;
+                } else if (firstOption) {
+                    requestPath.value = firstOption;
+                }
+
+                updateDynamicInputs();
+            }
+            
+            // Initialize and add listener
+            filterPaths();
+            requestCategory.addEventListener('change', filterPaths);
+            requestPath.addEventListener('change', updateDynamicInputs);
+        }
+    });
+</script>
+
+{% endblock %}

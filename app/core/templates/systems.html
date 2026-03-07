@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Main Page Header -->
+    <div class="justify-content-center d-flex border-bottom mt-2">
+        <h2>Your Systems</h2>  
+        <a href="{{url_for('docs.core', _anchor='systems')}}" class="link-underline-primary ms-1"><i class="small bi bi-info-square"></i></a>
+    </div>
+
+    <!-- LARGE ONLY -->
+    <!-- Add System Button to trigger modal -->
+    <div class="d-none d-lg-block text-center">
+        <button type="button" class="btn btn-primary btn-lg w-50 m-4" data-bs-toggle="modal" data-bs-target="#addSystemFormModal">Add System</button>
+    </div>
+
+    <!-- LESS THAN LG ONLY -->
+    <!-- Add System Button to trigger modal -->
+    <div class="d-lg-none text-center">
+        <button type="button" class="btn btn-primary w-75 m-4" data-bs-toggle="modal" data-bs-target="#addSystemFormModal">Add System</button>
+    </div>
+
+
+    <!-- Add System Modal -->
+    <form action="" method="post" class="text-center" novalidate>
+        <div class="modal fade" id="addSystemFormModal" tabindex="-1" aria-labelledby="addSystemFormModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 90vw">
+                <div class="modal-content border-info">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="addSystemFormModalLabel">Add System Form</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row justify-content-center">
+                            <div class="col-12">
+                                {{ form.hidden_tag() }}
+                                <div class="row">
+                                    <div class="col-lg-3 col-12">
+                                        {{ macroTemplate.form_field(form.system_name) }}
+                                        <br>
+                                        {{ macroTemplate.form_field(form.system_url) }}
+                                        <br>
+                                    </div>
+                                    <div class="col-lg-3 col-12">
+                                        {{ macroTemplate.form_dropdown(form.system_type)}}
+                                        <br>
+                                        {{ macroTemplate.form_dropdown(form.deployment_type)}}
+                                        <br>
+                                    </div>
+                                    <div class="col-lg-3 col-12">
+                                        {{ macroTemplate.form_field(form.step_user_id)}}
+                                        <br>
+                                        {{ macroTemplate.form_field(form.step_user_password)}}
+                                        <br>
+                                    </div>
+                                    <div class="col-lg-3 col-12">
+                                        {{ macroTemplate.form_field(form.default_context)}}
+                                        <br>
+                                        {{ macroTemplate.form_field(form.default_workspace)}}
+                                        <br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        {{ form.submit(class="btn btn-success") }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    
+    <!-- Display added systems as Cards -->
+    {% if systems|length > 0 %}
+    <div class="row">
+        {% for system in systems %}
+        <div class="col-12 col-lg-4 col-md-6 h-100">
+            <!-- Cards to display systems on smaller screens -->
+            <div class="card mb-3 border-secondary {% if current_user.selected_system_id == system.id %}bg-info-subtle{% endif %}">
+                <!-- Card Header -->
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <!-- System Name -->
+                    <h5 class="mb-0 text-truncate">{{system.system_name}}</h5>
+
+                    <!-- Select System Toggle -->
+                    <form action="{{ url_for('core.select_system', system_id=system.id) }}" method="post" onsubmit="return confirm('Are you sure you want to {% if current_user.selected_system_id == system.id %}deselect{% else %}select{% endif %} system {{system.system_name}}?');" class="m-0">
+                        {{ form_delete.hidden_tag() }}
+                        <button type="submit" class="btn btn-link p-0 border-0 align-baseline" title="{% if current_user.selected_system_id == system.id %}Selected{% else %}Select{% endif %}">
+                            {% if current_user.selected_system_id == system.id %}
+                                <i class="bi bi-toggle2-on text-success" style="font-size: 2rem;"></i>
+                            {% else %}
+                                <i class="bi bi-toggle2-off text-secondary" style="font-size: 2rem;"></i>
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    
+                    <div class="row">
+                        <!-- URL -->
+                        <div class="col-12 col-lg-6">
+                            <a href="{{system.system_url}}" target="_blank"><p class="badge bg-primary text-wrap"></i> {{system.system_url}}</p></a>
+                        </div>
+                        
+                        <!-- Type and Deployment badges -->
+                        <div class="col text-center">
+                            {% if system.system_type.name == "production" %}
+                                <span class="badge bg-danger">{{system.system_type.value}}</span>
+                            {% elif system.system_type.name == "qa" %}
+                                <span class="badge bg-warning">{{system.system_type.value}}</span>
+                            {% else %}
+                                <span class="badge bg-success">{{system.system_type.value}}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="col text-center">
+                            <span class="badge bg-secondary text-dark">{{system.deployment_type.value}}</span>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Username, ID, Context, workspace data -->
+                    <table class="table table-sm table-borderless mt-1">
+                        <tbody class="table-group-divider">
+                            <tr>
+                                <td>
+                                    User
+                                </td>
+                                <td class="text-break">
+                                    {{system.step_user_id}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Password
+                                </td>
+                                <td class="text-break">
+                                    {{system.step_user_password}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Context
+                                </td>
+                                <td class="text-break">
+                                    {{system.default_context}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Workspace
+                                </td>
+                                <td class="text-break">
+                                    {{system.default_workspace}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer text-body-secondary d-flex justify-content-between">
+                        
+                    <!-- Delete Button -->
+                    <form action="{{ url_for('core.delete_system', system_id=system.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete system {{system.system_name}}?');" class="m-0">
+                        {{ form_delete.hidden_tag() }}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash-fill"></i> Delete
+                        </button>
+                    </form>
+                    
+                    <!-- Edit Button -->
+                    <button type="button" class="btn btn-warning btn-sm" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#editSystemModal"
+                            data-system-id="{{ system.id }}"
+                            data-system-name="{{ system.system_name }}"
+                            data-system-url="{{ system.system_url }}"
+                            data-system-type="{{ system.system_type.name }}"
+                            data-deployment-type="{{ system.deployment_type.name }}"
+                            data-step-user-id="{{ system.step_user_id }}"
+                            data-step-user-password="{{ system.step_user_password }}"
+                            data-default-context="{{ system.default_context }}"
+                            data-default-workspace="{{ system.default_workspace }}">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+    </div>
+    
+    {% else %}
+    <h4 class="text-danger text-center">No System Added. Use the button above to add one!</h4>
+    {% endif %}
+
+    <!-- Edit System Modal Form -->
+    <form action="" method="post" class="text-center" novalidate>  
+        <div class="modal fade" id="editSystemModal" tabindex="-1" aria-labelledby="editSystemModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 90vw">
+                <div class="modal-content border-info">
+                    <!-- Form Header -->
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="editSystemModalLabel">Edit System Form</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <!-- Form Elements -->
+                    <div class="modal-body">
+                        <div class="row justify-content-center">
+                            <div class="col-12">
+                                {{ form_edit.hidden_tag() }}
+                                <div class="row">
+                                    <!-- Hidden ID Tag -->
+                                    <div class="d-none">
+                                        {{ macroTemplate.form_field(form_edit.edit_system_id, optional_id="edit_system_id") }}
+                                    </div>
+
+                                    <div class="col-lg-3 col-12">
+                                        {{ macroTemplate.form_field(form_edit.edit_system_name, optional_id="edit_system_name") }}
+                                        <br>
+                                        {{ macroTemplate.form_field(form_edit.edit_system_url, optional_id="edit_system_url") }}
+                                        <br>
+                                    </div>
+                                    <div class="col-lg-3 col-12">
+                                        {{ macroTemplate.form_dropdown(form_edit.edit_system_type, optional_id="edit_system_type")}}
+                                        <br>
+                                        {{ macroTemplate.form_dropdown(form_edit.edit_deployment_type, optional_id="edit_deployment_type")}}
+                                        <br>
+                                    </div>
+                                    <div class="col-lg-3 col-12">
+                                        {{ macroTemplate.form_field(form_edit.edit_step_user_id, optional_id="edit_step_user_id")}}
+                                        <br>
+                                        {{ macroTemplate.form_field(form_edit.edit_step_user_password, optional_id="edit_step_user_password")}}
+                                        <br>
+                                    </div>
+                                    <div class="col-lg-3 col-12">
+                                        {{ macroTemplate.form_field(form_edit.edit_default_context, optional_id="edit_default_context")}}
+                                        <br>
+                                        {{ macroTemplate.form_field(form_edit.edit_default_workspace, optional_id="edit_default_workspace")}}
+                                        <br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <!-- Submit Button -->
+                        {{ form_edit.edit_submit(class="btn btn-warning") }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // This script auto-opens add-system modal when an error is detected in the form
+        var formErrorElements = document.getElementsByClassName("is-invalid");
+        if(formErrorElements && formErrorElements.length > 0){
+            var firstErrorElement = formErrorElements[0].id;
+            
+            if(firstErrorElement.startsWith("edit_")){
+                var myModalElement = document.getElementById("editSystemModal");
+                var modalTitleElement = document.getElementById("editSystemModalLabel");
+            }
+            else{
+                var myModalElement = document.getElementById("addSystemFormModal");
+                var modalTitleElement = document.getElementById("addSystemFormModalLabel");
+            }
+           
+            const myModal = new bootstrap.Modal(myModalElement);
+            myModal.show();
+            modalTitleElement.insertAdjacentHTML('beforeend', "<span class='text-danger'> - Error Occured </span>")
+        }
+
+        // This script populates the edit modal with data from the button of the corresponding system
+        try{
+            const editSystemModal = document.getElementById('editSystemModal');
+            if (editSystemModal) {
+                editSystemModal.addEventListener('show.bs.modal', event => {
+                    const button = event.relatedTarget;
+                    const updateUrl = button.getAttribute('data-update-url');
+                    editSystemModal.querySelector('#edit_system_name').value = button.getAttribute('data-system-name') || '';
+                    editSystemModal.querySelector('#edit_system_id').value = button.getAttribute('data-system-id') || '';
+                    editSystemModal.querySelector('#edit_system_url').value = button.getAttribute('data-system-url') || '';
+                    editSystemModal.querySelector('#edit_system_type').value = button.getAttribute('data-system-type') || '';
+                    editSystemModal.querySelector('#edit_deployment_type').value = button.getAttribute('data-deployment-type') || '';
+                    editSystemModal.querySelector('#edit_step_user_id').value = button.getAttribute('data-step-user-id') || '';
+                    editSystemModal.querySelector('#edit_step_user_password').value = button.getAttribute('data-step-user-password') || '';
+                    editSystemModal.querySelector('#edit_default_context').value = button.getAttribute('data-default-context') || '';
+                    editSystemModal.querySelector('#edit_default_workspace').value = button.getAttribute('data-default-workspace') || '';
+                });
+            }
+        }
+        catch(err){
+            console.error(err)
+        }
+    });
+</script>
+
+{% endblock %}

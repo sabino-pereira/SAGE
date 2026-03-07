@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+    <div class="container-fluid">
+
+        <!-- Main Page Header -->
+        <div class="justify-content-center d-flex border-bottom mt-2 mb-3">
+            <h2>GraphQL</h2>  
+            <a href="{{url_for('docs.api', _anchor='graphql')}}" class="link-underline-primary ms-1"><i class="small bi bi-info-square"></i></a>
+        </div>
+        
+        <form action="" method="post" class="text-center" novalidate>
+            {{ form.hidden_tag() }}
+
+            <!--Configuration Accordion-->
+            <div class="mb-3">
+                {{ macroTemplate.api_configuration_accordion(form) }}
+            </div>
+
+            
+            <!-- Toggle Sidebar Button -->
+            <div class="d-flex justify-content-center mb-2">
+                <button class="btn btn-outline-primary shadow-sm" type="button" onclick="toggleConsoleSidebar()" id="sidebarToggleBtn">
+                    <i class="bi bi-layout-sidebar-inset" id="sidebarToggleIcon"></i> <span class="ms-1">Show/Hide GraphQL Query</span>
+                </button>
+            </div>
+            
+            <!-- Main GraphQL Query and Output Elements -->
+            <div class="row mt-4">
+                
+                <!-- Input query element -->
+                <div class="col-12 col-lg-6 mb-4" id="api-input-toggle">
+                    <div class="card border border-primary">
+                        <!-- Header with title -->
+                        <div class="card-header text-bg-primary">
+                            GraphQL Query
+                        </div>
+                        
+                        <!-- Footer Class at top with Buttons -->
+                        <div class="card-footer">
+                            <div class="row p-2">
+                                <!-- Prettify Query Button -->
+                                <div class="col-6">
+                                    <button type="button" id="prettify-btn" class="btn btn-warning w-100" onclick="prettify_graphql()"><i class="bi bi-magic"></i> Prettify</button>
+                                </div>
+                                <!-- Run Query Button, submits graphql query -->
+                                <div class="col-6">
+                                    <button type="submit" class="btn btn-success w-100" onclick="showLoadingIcon('graphql-output-container')"><i class="bi bi-play-fill"></i> Execute</button>
+                                </div>
+                            </div>                            
+                        </div>
+
+                        <!-- Query Body -->
+                        <div class="card-body p-0">
+                    
+                            {{ macroTemplate.form_field(form.query,"","custom-graphql-query") }}
+                        </div>
+
+                        
+                    </div>
+                </div>
+                
+                <!-- Output element -->
+                <div class="col-12 col-lg-6 mb-4" id="output-element-container-2">
+                    <div class="card border border-primary h-100">
+                        <!-- Header with title -->
+                        <div class="card-header text-bg-primary">
+                            Output
+                        </div>
+                    
+                        <div class="card-body" id="graphql-output-container">
+                            {% if return_dictionary %}
+                                <div class="row mt-2">
+                                    <!-- Output Header -->                                   
+                                    <h4 class="col-12 col-lg-8 text-center text-lg-start fst-italic text-muted">{{ return_dictionary["header"]|safe }}</h4>
+
+                                    <div class="col-12 col-lg-4 text-center text-lg-end"> 
+                                        <!-- Clear Page Button -->
+                                        <a type="button" class="btn btn-danger btn-sm" href="{{url_for('api.clear_api')}}"><i class="bi bi-x-circle"></i> Clear</a>
+                                        
+                                        <!-- Copy Output Button -->
+                                        {{macroTemplate.copy_text_button("graphql-output-details") }} 
+                                    </div>
+                                </div>
+                                
+                                <hr>
+                                
+                                <!-- Output Data -->
+                                <pre class="text-start" id="graphql-output-details">{{ return_dictionary["data"] }}</pre>
+                            
+                            {% else %}
+                                <!-- Default Data -->
+                                <p class="fst-italic text-muted">Output will be printed here...</p>
+                            {% endif %}
+
+                            {{return_value}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- This script auto opens configuration accordion on input error -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        
+            //This block auto-opens Configuration Accordion when an error is detected in the form
+            var formErrorElements = document.getElementsByClassName("is-invalid");
+            if(formErrorElements && formErrorElements.length > 0){            
+                const myAccordion = document.getElementById('collapseInputs');
+                const bsCollapse = new bootstrap.Collapse(myAccordion, {
+                    toggle: false
+                });
+                bsCollapse.show();
+            }
+        });
+    </script>
+
+
+    <!-- Script to Prettify the Query using AJAX-->
+    <script>
+        async function prettify_graphql() {
+            try{
+                let query_input_element = document.getElementById("custom-graphql-query")
+                if (query_input_element) {
+                    // Prettify Query via AJAX
+                    const response = await fetch('/api/prettify-graphql', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain'
+                        },
+                        body: query_input_element.value
+                    })
+                    
+                    // Fetch response and check status
+                    const queryResponseJSON = await response.json();
+                    let notificationText;
+                    let notificationClass;
+
+                    if (queryResponseJSON["status"] == "error") {
+                        notificationClass = "alert-danger"
+                        notificationText = queryResponseJSON["message"];
+                    }
+                    else {
+                        notificationClass = "alert-success"
+                        notificationText = "Query Prettified"
+                        query_input_element.value = queryResponseJSON["message"];
+                    }
+
+                    // Display Alert
+                    var alertElement = document.getElementById("my-custom-alert");
+                    var alertElementText = document.getElementById("my-custom-alert-text");
+                    if (alertElement && alertElementText) {
+                        alertElement.classList.add(notificationClass)
+                        alertElementText.textContent = notificationText;
+                        alertElement.style.display = "block"
+                        setTimeout(() => {
+                            alertElement.style.display = "none";
+                        }, 4000);
+                    }
+                }
+            }
+            catch(err){
+                console.error(err)
+            }
+        } 
+    </script>
+{% endblock %}

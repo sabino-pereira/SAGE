@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+
+        <!-- Main Page Header -->
+        <div class="text-center mt-2 p-2">
+            <h1>Getting Started</h1>  
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="container card border">
+            <div class="fw-bold card-header fs-4">
+                Table of Contents
+            </div>
+            <ol class="text-start mt-2">
+                <li><a href="#introduction" class="text-decoration-none">Introduction</a></li>
+                <li><a href="#authentication" class="text-decoration-none">Logging In & Registration</a></li>
+                <li><a href="#configuration" class="text-decoration-none">Configuration</a></li>
+                <li><a href="#first-run" class="text-decoration-none">First Run Verification</a></li>
+                <li><a href="#next-steps" class="text-decoration-none">Next Steps</a></li>
+            </ol>
+        </div>
+
+        <br>
+
+        <section id="introduction" class="mt-2">
+            <h2><a class="text-decoration-none" href="#introduction">Introduction</a></h2>
+            <p class="fs-4">Welcome to SAGE! This guide will walk you through the initial steps to get the application setup for your use.</p>
+            <p>SAGE (STEP API Gateway Engine) is an application designed specially for Stibo STEP to help developers monitor, maintain, and performs tasks on STEP systems they manage. It does so using various APIs, integrations, and features that STEP itself provides, bringing them all together in one cohesive and easy to use package.</p>
+        </section>
+        
+        <div class="alert alert-warning">
+            <strong>Pro Tip:</strong> SAGE is a responsive web app. This means that it will scale itself appropriately depending on which device it's used on. Try accessing it from your phone or tablet!
+        </div>
+
+        <br>
+        <hr>
+        
+        <section id="authentication" class="mt-2">
+            <h2><a class="text-decoration-none" href="#authentication">Logging In & Registration</a></h2>
+            <p class="mb-4">To use SAGE, you'll need an account. The application supports user registration, which may be enabled or disabled by the application administrator.</p>
+            
+
+            <h4>Creating Your Account</h4>
+            <p>If registration is open, you can create an account by following these steps:</p>
+            <ol>
+                <li>Navigate to the homepage and click the <strong>Register</strong> button, or find it under the "Account" dropdown in the navigation bar.</li>
+                <li>Fill out the registration form with your desired username, a valid email address, and a secure password.</li>
+                <li>Click the <code>Register</code> button to create your account.</li>
+            </ol>
+
+            <div class="alert alert-primary">
+                <strong>Important for Administrators:</strong> The very first user to register in the application is automatically assigned the <strong>Admin</strong> role. This role has extra privileges, including access to the Admin dashboard. All subsequent users will be standard users.
+            </div>
+
+            <h4>Logging In</h4>
+            <p>Once your account is created, you can log in using either your username or your registered email address, and your password. Successful login will take you to your personalized homepage.</p>
+        </section>
+        
+        <br>
+        <hr>
+
+        <section id="configuration" class="mt-2">
+            <h2><a class="text-decoration-none" href="#configuration">Configuration</a></h2>
+            <p>After your first login, you need to configure SAGE to connect to your Stibo STEP systems. This involves three main areas:</p>
+            
+            <div class="accordion" id="configAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <strong>1. Adding Systems</strong>
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#configAccordion">
+                        <div class="card-body p-4">
+                            Navigate to the <a href="{{ url_for('core.systems') }}">Systems</a> page. Here you can add each of your STEP instances (e.g., Development, QA, Production). You will need to provide basic information like a system name and its URL. For more details on the different fields, please refer to the <a href="{{ url_for('docs.core') }}">Core Features documentation</a>.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <strong>2. Setting up Authentication</strong>
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#configAccordion">
+                        <div class="card-body p-4">
+                            For SAGE to communicate with a STEP system, it needs credentials. When adding or editing a system, you must provide a <strong>STEP User ID</strong> and <strong>Password</strong>. It is highly recommended to create a dedicated service account within STEP for SAGE, with only the necessary permissions required for the features you intend to use.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            <strong>3. Network Configuration (Whitelisting)</strong>
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#configAccordion">
+                        <div class="card-body p-4">
+                            Your STEP systems must be network-accessible from the server where SAGE is running. If you are on the SaaS version of STEP, you need to whitelist SAGE's server IP in the self service portal. For On-prem, it might be your firewall or cloud security group rules, if any.
+                            <br><br>
+                            If you are an Admin user, you can find the public IP address of the SAGE server on the <strong>Admin</strong> page, which should help your network team with the whitelisting process.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        
+        <br>
+        <hr>
+
+        <section id="first-run" class="mt-2">
+            <h2><a class="text-decoration-none" href="#first-run">First Run Verification</a></h2>
+            <p>After configuring your first system, it's time to verify that everything is working correctly. This simple test will confirm if SAGE can communicate with your STEP instance.</p>
+            <ol>
+                <li>Go to the <a href="{{ url_for('core.systems') }}">Systems</a> page.</li>
+                <li>Find the system you just added and click the <strong>Select</strong> button next to it. The button will turn green, indicating it's the active system.</li>
+                <li>Navigate back to the <a href="{{ url_for('core.home') }}">Homepage</a> by clicking the SAGE logo in the top-left corner.</li>
+                <li>You will see a "System Details" card. Initially, it might show "No Data".</li>
+                <li>Click the <code><span class="bi bi-arrow-clockwise"></span> Refresh</code> button on this card.</li>
+                <li>If the connection is successful, the card will populate with details from your STEP system, such as the version, license information, and more.</li>
+            </ol>
+            <div class="alert alert-success">
+                <strong>Success!</strong> If you see the system details, your setup is complete. You can now explore all the other features of SAGE.
+            </div>
+            <div class="alert alert-danger">
+                <strong>Troubleshooting:</strong> If it fails, please double-check the system URL, user credentials, and network whitelisting as described in the Configuration section.
+            </div>
+        </section>
+        
+        <br>
+        <hr>
+
+        <section id="next-steps" class="mt-2">
+            
+            <h2><a class="text-decoration-none" href="#next-steps">Next Steps</a></h2>
+            <p>Once you have installed and configured SAGE, you are ready to explore its features. Here are some suggestions:</p>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <a href="{{ url_for('docs.api') }}" class="text-decoration-none">
+                        <div class="card h-100 border-primary">
+                            <h5 class="card-header">APIs</h5>
+                            <div class="card-body">
+                               <p class="card-text">Use the various API utilities to interact with STEP.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{{ url_for('docs.monitoring') }}" class="text-decoration-none">
+                        <div class="card h-100 border-primary">
+                            <h5 class="card-header">Monitoring</h5>
+                            <div class="card-body">
+                               <p class="card-text">Use these features to monitor performance and issues on your STEP system.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{{ url_for('docs.tools') }}" class="text-decoration-none">
+                        <div class="card h-100 border-primary">
+                            <h5 class="card-header">Dev Tools</h5>
+                            <div class="card-body">
+                               <p class="card-text">Some developer tools provided for day to day development tasks.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+        <br>
+    </div>
+{% endblock %}

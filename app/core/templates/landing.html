@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="pt-2 pb-5 mt-4 mb-1 text-center">
+        <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo" class="img-fluid mb-4" style="width: 15vh;">
+        <h1 class="display-2 fw-bold mb-4 custom-brand-color" style="letter-spacing: 0.05em;">{{app_name_full}}</h1>
+        <div class="col-lg-8 mx-auto">
+            <p class="display-6 fw-bold mb-4">
+                All-in-one toolkit built for Stibo STEP MDM. 
+            </p>
+            <p class="display-6 mb-4">
+                Monitor, manage, and develop with powerful API tools.
+            </p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('docs.getting_started') }}" class="btn btn-custom-color btn-lg px-4 gap-3">Getting Started <i class="bi bi-arrow-right"></i></a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg px-4">Login</a>
+                {% if registration_allowed %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-success btn-lg px-4">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <img src="{{ url_for('static', filename='img/ss-homepage.png') }}" alt="Homepage Example" title="Homepage Example" class="img-fluid img-thumbnail border-info mb-4 d-none d-lg-block mx-auto">
+    
+    <br><br><br> 
+    <!-- Features Section Header -->
+    <div class="row text-center mb-1">
+        <h2 class="fw-bold">Feature Highlights</h2>
+        <p class="lead text-muted">Discover what you can do with {{app_name}}.</p>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="row g-4">
+        {{ macroTemplate.feature_card('Console', 'Custom built panel combining multiple APIs for one click commands.', 'bi-terminal') }}
+        {{ macroTemplate.feature_card('REST API', 'Execute all Rest API V2 methods on the system.', 'bi-broadcast-pin') }}
+        {{ macroTemplate.feature_card('GraphQL', 'Execute GraphQL queries against the STEP system.', 'bi-blockquote-right') }}
+        
+        {{ macroTemplate.feature_card('Monitoring Sensors', 'Monitor the health of your STEP system.', 'bi-router-fill') }}   
+        {{ macroTemplate.feature_card('Healthchecks', 'View results of built-in healthchecks.', 'bi-heart-pulse') }}
+        
+        {{ macroTemplate.feature_card('Developer Tools', 'A suite of tools to assist with daily STEP development tasks.', 'bi-tools') }}
+        {{ macroTemplate.feature_card('Knowledge Hub', 'Pro tips & tricks to improve your development workflow.', 'bi-lightbulb') }}
+        
+        {{ macroTemplate.feature_card('Multi system support', 'Easily switch between your multiple STEP instances.', 'bi-window-stack') }}
+        {{ macroTemplate.feature_card('Phone Friendly UI', 'Built to work on all screen sizes like mobile and desktop.', 'bi-phone') }}
+    </div>
+
+    <hr class="my-5">
+
+    <footer class="py-4 custom-footer">
+        <div class="container">
+            <figure class="text-center mb-0">
+                <blockquote class="blockquote">
+                    <p>"This isn't just an app. It's the standard perfection measures itself against."</p>
+                </blockquote>
+                <figcaption class="blockquote-footer mb-0">
+                    <a href="https://sabino.in" target="_blank" rel="noopener noreferrer">Sabino Pereira</a>, an industry titan in his own local environment.
+                </figcaption>
+            </figure>
+        </div>
+    </footer>
+    <br><br>
+</div>
+
+{% endblock %}

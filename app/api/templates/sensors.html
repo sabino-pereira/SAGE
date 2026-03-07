@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    <!-- Main Page Header -->
+    <div class="justify-content-center d-flex border-bottom mt-2">
+        <h2>Sensors</h2>  
+        <a href="{{url_for('docs.monitoring', _anchor='sensors')}}" class="link-underline-primary ms-1"><i class="small bi bi-info-square"></i></a>
+    </div>
+
+    <!--Search/Filter component for table, initially hidden, shown only when sensors data is returned-->
+    <div class="input-group my-3" id="sensorSearchGroup" style="display: none;">
+        <input type="text" class="form-control" id="sensorSearchInput" placeholder="Filter...">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Filter by Status</button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item filter-option" href="#" data-filter="">All</a></li>
+            <li><a class="dropdown-item filter-option" href="#" data-filter="OK">OK</a></li>
+            <li><a class="dropdown-item filter-option" href="#" data-filter="WARNING">Warning</a></li>
+            <li><a class="dropdown-item filter-option" href="#" data-filter="CRITICAL">Critical</a></li>
+            <li><a class="dropdown-item filter-option" href="#" data-filter="UNKNOWN">Unknown</a></li>
+        </ul>
+    </div>
+
+    <!--Main Content, initially has loading text that will be replaced by sensors data once it's loaded-->
+    <div id="sensor-data-container" class="mt-2">
+        <!--Loading Time Counter-->
+        <div class="text-center mb-2">Time Elapsed: <span id="time-elapsed">0</span> seconds</div>
+
+        <!--Loading Progress Bar-->
+        <div class="progress">
+            <div id="progress-bar-time" class="progress-bar bg-warning text-bg-warning" role="progressbar" style="width: 0%"></div>
+        </div>
+        <br>
+    
+        <!--Loading Text-->
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        Please be patient
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">This method takes time to load when called. </p>
+                        <p>Approximate wait times are 60 seconds.</p>
+                        <code>Until then, why don't try reciting the Alphabet backwards?</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+    <!--Script for fetching data from the _sensor_data page and replacing the sensor-data-container element's contents with it-->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startTime = Date.now();
+            const counterElement = document.getElementById('time-elapsed');
+            const progressBar = document.getElementById('progress-bar-time');
+            const sensorDataContainer = document.getElementById('sensor-data-container');
+            const searchGroup = document.getElementById('sensorSearchGroup');
+
+            const timerInterval = setInterval(function() {
+                const currentTime = Date.now();
+                const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+                if (counterElement) {
+                    counterElement.textContent = elapsedSeconds;
+                }
+                if (progressBar) {
+                    let percentageProgress = Math.min((elapsedSeconds / 60) * 100, 100);
+                    progressBar.style.width = percentageProgress + '%';
+                }
+            }, 1000);
+
+            //Sets a 60 seconds timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000); 
+
+            // Fetch the sensor data
+            fetch('{{ url_for("api.sensor_data") }}', { signal: controller.signal })
+                .then(response => response.json())
+                .then(sensorData => {
+                    clearInterval(timerInterval);
+                    clearTimeout(timeoutId);
+                    
+                    sensorDataContainer.innerHTML = sensorData.return_html_data;
+
+                    if(sensorData.return_code == "Success") {
+                        searchGroup.style.display = 'flex';
+
+                        $("#sensorSearchInput").on("keyup", function() {
+                            var value = $(this).val().toLowerCase();
+                            $("#sensors_table_body tr").filter(function() {
+                                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                            });
+                            $("#sensors_cards .card").filter(function() {
+                                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                            });
+                        });
+
+                        $(".filter-option").on("click", function(e) {
+                            e.preventDefault(); // Prevent default anchor tag behavior
+                            const filterValue = $(this).data("filter");
+                            const searchInput = $("#sensorSearchInput");
+                            searchInput.val(filterValue);
+                            searchInput.trigger("keyup"); // Trigger the keyup event to apply the filter
+                        });
+                    }
+                })
+                .catch(error => {
+                    clearInterval(timerInterval);
+                    clearTimeout(timeoutId);
+                    if (error.name === 'AbortError') {
+                        sensorDataContainer.innerHTML = '<div class="alert alert-danger" role="alert"><strong>Error:</strong> The request timed out after 60 seconds. Please try again.</div> <br> <div class="row justify-content-center""> <div class="col-4"> <a href="{{url_for("api.sensors")}}" class="btn btn-lg btn-primary nav-item w-100" role="button">Retry</a></div></div>';
+                    } 
+                    else {
+                        sensorDataContainer.innerHTML = '<div class="alert alert-danger" role="alert"><strong>Error:</strong> An unexpected error occurred while fetching sensor data. Please try again.</div> <br> <div class="row justify-content-center""> <div class="col-4"> <a href="{{url_for("api.sensors")}}" class="btn btn-lg btn-primary nav-item w-100" role="button">Retry</a></div></div>';
+                    }
+                });
+        });
+    </script>
+
+{% endblock %}

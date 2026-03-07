@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+    <div class="container-fluid">
+        
+        <!-- Main Page Header -->
+        <div class="justify-content-center d-flex border-bottom mt-2 mb-3">
+            <h2>Console</h2>  
+            <a href="{{url_for('docs.api', _anchor='console')}}" class="link-underline-primary ms-1"><i class="small bi bi-info-square"></i></a>
+        </div>
+
+        <!-- Whole page is the main Console form, with each section being a separate submit button. -->
+        <form action="" method="post" class="text-center" novalidate>
+            {{ form.hidden_tag() }}
+            
+            <!--Configuration Accordion-->
+            <div class="mb-3">
+                {{ macroTemplate.api_configuration_accordion(form) }}
+            </div>
+
+            <!-- Toggle Sidebar Button -->
+            <div class="d-flex justify-content-center mb-2">
+                <button class="btn btn-outline-primary shadow-sm" type="button" onclick="toggleConsoleSidebar()" id="sidebarToggleBtn">
+                    <i class="bi bi-layout-sidebar-inset" id="sidebarToggleIcon"></i> <span class="ms-1">Show/Hide Actions</span>
+                </button>
+            </div>
+
+            <!--Console form main Body-->
+            <div class="row">
+                
+                <!--Console Action Selector (Sidebar)-->
+                <div class="col-12 col-lg-3 mb-4" id="api-input-toggle">
+                    <!-- Actions Card -->
+                    <div class="card border border-primary">
+                        <!-- Header with title -->
+                        <div class="card-header text-bg-primary">
+                            Actions
+                        </div>
+                        
+                        <!-- Body with Accordions -->
+                        <div class="card-body p-0">
+                            <div class="accordion" id="consoleInputAccordion">
+                        
+                                <!--System Management Group-->
+                                <div class="accordion-item">
+                                    <!--System Management Accordion Header-->
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            System Management
+                                        </button>
+                                    </h2>   
+                                    <!--System Management Accordion Body-->
+                                    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#consoleInputAccordion">
+                                        <div class="accordion-body"> 
+                                            <div class="accordion" id="systemManagementAccordion">
+                                                <!--Check Credentails Accordion-->
+                                                {{ macroTemplate.console_accordion_item_with_button("validate_credentials", "btn-primary", "Validate Credentials", "Validate entered user details on the selected system", "systemManagementAccordion") }}
+                                                
+                                                <!--System Details Accordion-->
+                                                {{ macroTemplate.console_accordion_item_with_button("system_details", "btn-primary", "System Details", "Fetch details of the '" + selected_system.system_name + "' System", "systemManagementAccordion") }}
+                                            
+                                                <!--Server Restart Accordion-->
+                                                {{ macroTemplate.console_accordion_item_with_button("server_restart", "btn-danger", "Server Restart", "Restart the '" + selected_system.system_name + "' System", "systemManagementAccordion", "Are you sure you want to restart the " + selected_system.system_name + " system?") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!--IEP Group-->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNew1" aria-expanded="false" aria-controls="collapseNew1">
+                                            Integration Endpoints / Event Processors
+                                        </button>
+                                    </h2>
+                                    <div id="collapseNew1" class="accordion-collapse collapse" data-bs-parent="#consoleInputAccordion">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">{{ macroTemplate.form_dropdown(form.integration_endpoint_type, context=form.integration_endpoint_type.label, optional_id="integration_endpoint_type")}}</div>
+                                            
+                                            <div class="mb-3">{{ macroTemplate.form_dropdown(form.integration_endpoint_action, context=form.integration_endpoint_action.label, optional_id="integration_endpoint_action")}}</div>
+
+                                            <div class="mb-3">{{ macroTemplate.form_dropdown(form.integration_endpoint_choice, context=form.integration_endpoint_choice.label, optional_id="integration_endpoint_choice")}}</div>
+
+                                            <div class="mb-3" id="integration_endpoint_ids_container">{{ macroTemplate.form_field(form.integration_endpoint_ids, optional_context="If multiple, separate using semicolon", optional_id="integration_endpoint_ids")}}</div>
+                                            
+                                            <button type="submit" name="action" value="integration_endpoint_action" onclick="showLoadingIcon('console-output-container')" class="btn btn-primary w-100">Execute selected action</button>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!--Output Element-->
+                <div class="col-12 col-lg-9 mb-4">                   
+                    <!-- Output Card -->
+                    <div class="card border border-primary h-100">
+                        <!-- Header with title -->
+                        <div class="card-header text-bg-primary">
+                            Output
+                        </div>
+                        
+                        <div class="card-body" id="console-output-container">
+                        
+                            {% if return_dictionary %}
+                                <div class="row mt-2">
+                                    <!-- Output Header -->                                   
+                                    <h4 class="col-12 col-lg-4 text-center text-lg-start fst-italic text-muted">{{ return_dictionary["header"]|safe }}</h4>
+
+                                    <div class="col-12 col-lg-8 text-center text-lg-end"> 
+                                        <!-- Clear Page Button -->
+                                        <a type="button" class="btn btn-danger btn-sm" href="{{url_for('api.clear_api')}}"><i class="bi bi-x-circle"></i> Clear</a>
+                                        
+                                        <!-- Copy Output Button -->
+                                        {{macroTemplate.copy_text_button("console-output-details") }} 
+                                    </div>
+                                </div>
+                                
+                                <hr>
+                                
+                                <!-- Output Data -->
+                                <div id="console-output-details">{{ return_dictionary["data"]|safe }}</div>
+                                
+                            {% else %}
+                                <!-- Default Data -->
+                                <p class="fst-italic text-muted">Output will be printed here...</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        //This block auto-opens Console Configuration Accordion when an error is detected in the form
+        var formErrorElements = document.getElementsByClassName("is-invalid");
+        if(formErrorElements && formErrorElements.length > 0){            
+            const myAccordion = document.getElementById('collapseInputs');
+            const bsCollapse = new bootstrap.Collapse(myAccordion, {
+                toggle: false
+            });
+            bsCollapse.show();
+        }
+
+
+        //This block is for dynamically showing the Integration Endpoint ID input box when the correct dropdwon option is selected
+        const endpointChoiceDropdown = document.getElementById('integration_endpoint_choice');
+        const endpointIdsContainer = document.getElementById('integration_endpoint_ids_container');
+
+        function toggleEndpointIdsContainer() {
+            if (endpointChoiceDropdown && endpointIdsContainer) {
+                if (endpointChoiceDropdown.value === 'specified') {
+                    endpointIdsContainer.style.display = 'block';
+                } else {
+                    endpointIdsContainer.style.display = 'none';
+                }
+            }
+        }
+
+        if (endpointChoiceDropdown) {
+            
+            // Initial check on page load
+            toggleEndpointIdsContainer();
+            
+            // Add event listener for changes
+            endpointChoiceDropdown.addEventListener('change', toggleEndpointIdsContainer);
+        }
+    });
+</script>
+
+{% endblock %}

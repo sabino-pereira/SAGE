@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+
+        <!-- Main Page Header -->
+        <div class="text-center mt-2 p-2">
+            <h1>Monitoring</h1>
+            <p class="fs-5 text-muted">A quick reference guide to the system monitoring and diagnostic tools available in SAGE.</p>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="container card border mb-4">
+            <div class="fw-bold card-header fs-4">
+                Table of Contents
+            </div>
+            <ol class="text-start mt-2">
+                <li><a href="#sensors" class="text-decoration-none">System Sensors</a></li>
+                <li><a href="#healthchecks" class="text-decoration-none">Healthchecks</a></li>               
+            </ol>
+        </div>
+
+        <br>
+
+        <section id="sensors" class="mt-2">
+            <h2><a class="text-decoration-none" href="#sensors">System Sensors</a></h2>
+            <p class="fs-5">SAGE integrates with the native <strong>'Sensors for External Monitoring'</strong> feature provided by Stibo STEP. This tool offers a real-time snapshot of the operational status of various system components such as background processes, integration endpoints, etc.</p>
+            <p class="fs-5">To access the it, navigate to <strong>Monitoring &gt; Sensors</strong>. Upon loading, SAGE queries the target STEP system. Please note that the initial fetch may take a moment as the server aggregates the sensor data. Subsequent requests are instant due to server-side caching until refreshed by the server (every 5 minutes in my testing).</p>
+            
+            <img src="{{ url_for('static', filename='img/ss-sensors-loading.png') }}" alt="Sensors Loading State" class="img-fluid img-thumbnail m-2 border-info">
+            
+            <div class="alert alert-warning">
+                <strong>Note:</strong> If the request times out, it usually indicates the STEP server is under heavy load or taking longer than expected to generate the sensor report. Please wait a few moments and click 'Retry'.
+            </div>
+
+            <h4 class="text-info">Interpreting the Data</h4>
+            <p class="fs-5">Sensor data is presented in a responsive layout - as a table on larger screens and as cards on mobile devices. Each entry lists the sensor's name, its current status, and a link to view additional details.</p>
+            <img src="{{ url_for('static', filename='img/ss-sensors-loaded.png') }}" alt="Sensors Dashboard" class="img-fluid img-thumbnail m-2 border-info">
+            
+            <p class="fs-5">Status indicators are color-coded for immediate visual feedback:</p>
+            <ul>
+                <li><span class="text-success fw-bold">Green (OK):</span> The component is functioning normally.</li>
+                <li><span class="text-warning fw-bold">Yellow (WARNING):</span> The component requires attention but is operational.</li>
+                <li><span class="text-danger fw-bold">Red (CRITICAL):</span> The component has failed or is in a critical state.</li>
+            </ul>
+            <p class="fs-5">You can quickly locate specific sensors using the search bar or filter the list by status using the toolbar controls.</p>
+            <img src="{{ url_for('static', filename='img/ss-sensors-filter.png') }}" alt="Sensors Filtering" class="img-fluid img-thumbnail m-2 border-info">
+
+            <div class="alert alert-info">
+                <strong>Access Requirement:</strong> This feature utilizes a public monitoring endpoint. It requires network access to the STEP server but does not require specific user authentication credentials within SAGE.
+            </div>
+        </section>
+        
+        <br>
+        <hr>
+        
+        <section id="healthchecks" class="mt-2">
+            <h2><a class="text-decoration-none" href="#healthchecks">Healthchecks</a></h2>
+            <p class="fs-5">Healthchecks are diagnostic tests configured within the STEP platform to analyze system configuration, data integrity, and performance metrics. SAGE provides a streamlined interface to view the results of these tests via <strong>Monitoring &gt; Healthchecks</strong>.</p>
+            <p class="fs-5">Unlike Sensors, which provide a live status, Healthchecks are typically scheduled tasks or manually triggered reports. SAGE retrieves the history of these reports, allowing you to analyze system health over time.</p>
+            <div class="alert alert-warning">
+                <strong>Note:</strong> The healthchecks feature in SAGE is still in early stages, so it doesn't display a lot of details, just a summary for now.
+            </div>
+
+            <h4 class="text-info">Retrieving Reports</h4>
+            <p class="fs-5">To view Healthcheck data, specify a time window (e.g., the last 24 hours) in the configuration panel. This filters the results to show only reports generated within that timeframe.</p>
+            
+            <p class="fs-5">Click <strong>Fetch</strong> to retrieve the data from the STEP system.</p>
+            
+            <img src="{{ url_for('static', filename='img/ss-healthcheck-fetch.png') }}" alt="Healthcheck Configuration" class="img-fluid img-thumbnail m-2 border-info">
+
+            <h4 class="text-info">Analyzing Results</h4>
+            <p class="fs-5">Results are displayed as individual cards for each Healthcheck. Each card provides a high-level summary:</p>
+            <ul>
+                <li><strong>Header:</strong> Displays the Healthcheck name and overall status.</li>
+                <li><strong>Body:</strong> Details the category, severity level, and the number of issues detected.</li>
+                <li><strong>Footer:</strong> Shows the exact timestamp of when the check was performed.</li>
+            </ul>
+            <p class="fs-5">Use the accordion filters at the top of the page to narrow down results by category or to isolate checks that reported issues.</p>
+
+            <img src="{{ url_for('static', filename='img/ss-healthcheck-fetched.png') }}" alt="Healthcheck Results" class="img-fluid img-thumbnail m-2 border-info">
+            
+            <div class="alert alert-info">
+                <strong>Access Requirement:</strong> This feature queries the STEP GraphQL API. Therefore, a valid STEP User ID and Password must be configured for the system in SAGE to retrieve this data.
+            </div>
+        </section>
+        
+        <br>
+        <hr>
+
+        <br>
+    </div>
+{% endblock %}

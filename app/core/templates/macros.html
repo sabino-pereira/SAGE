@@ -1,0 +1,181 @@
+<!-- This is the default macro to render a normal input field. Additional text 'context' can be passed that will display below it. -->
+{% macro form_field(field, optional_context=None, optional_id=None) %}
+    {% if optional_id %}
+        {{field(class="form-control" + (' is-invalid' if field.errors else ''), placeholder=field.label.text, id=optional_id)}}
+    {% else %}
+        {{field(class="form-control" + (' is-invalid' if field.errors else ''), placeholder=field.label.text)}}
+    {% endif %}
+    {% if optional_context %}
+        <span class="form-text">{{optional_context}}</span>
+    {% endif %}
+     
+    {% for error in field.errors %}
+        <span class="invalid-feedback">{{ error }}</span>
+    {% endfor %}
+{% endmacro %} 
+
+
+
+<!-- This macro will render a dropdown option as set in the form -->
+{% macro form_dropdown(field, context=None, optional_id=None) %}
+    {% if optional_id %}
+        {{field(class="form-select" + (' is-invalid' if field.errors else ''), placeholder=field.label.text, id=optional_id)}}
+    {% else %}
+        {{field(class="form-select" + (' is-invalid' if field.errors else ''), placeholder=field.label.text)}}
+    {% endif %}
+    {% if context %}
+        <span class="form-text">{{context}}</span>
+    {% endif %}
+     
+    {% for error in field.errors %}
+        <span class="invalid-feedback">{{ error }}</span>
+    {% endfor %}
+{% endmacro %}
+
+
+<!-- This macro will render the 'remember me' button as a checkbox -->
+{% macro remember_me(field) %}
+    {{field(class="form-check-input", type="checkbox")}} {{field.label(class="form-check-label")}}
+
+    {% for error in field.errors %}
+        <span class="invalid-feedback">{{ error }}</span>
+    {% endfor %}
+{% endmacro %}
+
+
+<!-- This macro will render the copy-text button and on click will run javascript to copy text from the input element to a user's clipboard -->
+{% macro copy_text_button(elementID) %}
+<button type="button" id="custom-copy-text-button" class="btn btn-info btn-sm" data-bs-content="Copied!" onclick="copyContentsOf('{{elementID}}')">
+    <i class="bi bi-clipboard" title="Copy Code"><strong>  Copy</strong></i>
+</button>
+{% endmacro %}
+
+
+<!-- This macro will render an accordion and button to submit the rest api form with a set action type -->
+{% macro console_accordion_item_with_button(action_type, button_type, header, details, parent_accordion_id, confirmation_message=None) %}
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="{{'#' + action_type}}">
+                {{header}}
+            </button>
+        </h2>
+        <div id="{{action_type}}" class="accordion-collapse collapse" data-bs-parent="{{'#' + parent_accordion_id}}">
+            <div class="accordion-body">
+                {% if confirmation_message %}
+                    <button type="submit" name="action" value="{{action_type}}" class="btn {{button_type}} w-100" onclick="if(confirm('{{ confirmation_message }}')) { showLoadingIcon('rest-api-output-container'); } else { return false; }">{{details}}</button>
+                {% else %}
+                    <button type="submit" name="action" value="{{action_type}}" class="btn {{button_type}} w-100" onclick="showLoadingIcon('console-output-container')">{{details}}</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+
+<!-- This macro is used to display system overview cards in homepage on login -->
+{% macro system_details_card(id, title, icon, link="#") %}
+    <div class="col-lg-3 col-6">
+        <div class="card custom-homepage-data-card h-100">
+            <div class="card-header">
+                <div class="row justify-content-center p-2">
+                    <div class="col-12 col-md-1 text-center"><i class="bi {{icon}}"></i></div>
+                    <div class="col text-center">{{title}}</div>
+                    <div class="col-12 col-md-1 text-center">
+                        <a href="{{link}}" target="_blank">
+                            <i class="bi bi-info-circle"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body text-center">
+                <p class="card-text fs-4 fw-bold placeholder-glow"><span class="replace-placeholder" id="{{id}}">-</span></p>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+<!-- This macro is for features card in homepage login -->
+{% macro feature_card(title, text, icon) %}
+    <div class="col-md-4 col-12">
+        <div class="card custom-homepage-login-utility-card h-100 border-2 rounded ">
+            <div class="card-body d-flex align-items-center">
+                <div class="me-3">
+                    <i class="bi {{icon}} fs-1"></i>
+                </div>
+                <div>
+                    <h5 class="card-title">{{title}}</h5>
+                    <p class="card-text small">{{text}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+
+<!-- This macro renders pagination pages in the admin page -->
+{% macro render_pagination(pagination, endpoint, tab) %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-end flex-wrap">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for(endpoint, page=pagination.prev_num, tab=tab) if pagination.has_prev else '#' }}"><span aria-hidden="true">&laquo;</span></a>
+        </li>
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+                <li class="page-item {% if pagination.page == page_num %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for(endpoint, page=page_num, tab=tab) }}" {% if pagination.page == page_num %}aria-current="page"{% endif %} >{{ page_num }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for(endpoint, page=pagination.next_num, tab=tab) if pagination.has_next else '#' }}"><span aria-hidden="true">&raquo;</span></a>
+        </li>
+    </ul>
+</nav>
+{% endmacro %}
+
+
+
+<!-- This Macro Renders the configuration Accordion in the API Pages -->
+{% macro api_configuration_accordion(form) %}
+    <div class="accordion" id="apiConfigurationAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInputs" aria-expanded="false" aria-controls="collapseInputs">
+                    Configuration
+                </button>
+            </h2>
+            <div id="collapseInputs" class="accordion-collapse collapse" data-bs-parent="#apiConfigurationAccordion">
+                <div class="accordion-body">
+                    
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            {{ form_field(form.executing_user_id, form.executing_user_id.label) }}
+                        </div>
+                        
+                        <div class="col-12 col-md-6 col-lg-3">
+                            {{ form_field(form.executing_user_password, form.executing_user_password.label) }}
+                        </div>
+                        
+                        <div class="col-12 col-md-6 col-lg-3">
+                            {{ form_field(form.context_id, form.context_id.label) }}
+                        </div>
+                        
+                        <div class="col-12 col-md-6 col-lg-3">
+                            {{ form_field(form.workspace_id, form.workspace_id.label) }}
+                        </div>
+
+                        <div class="col mt-3">
+                            <a class="btn btn-danger" href="{{url_for('api.clear_token')}}">Clear Saved Token</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

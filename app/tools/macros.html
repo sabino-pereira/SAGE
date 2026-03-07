@@ -1,0 +1,20 @@
+{% macro form_field(field, optionalContext=None) %}
+        {{field(class="form-control" + (' is-invalid' if field.errors else ''), placeholder=field.label.text)}}
+        {% if optionalContext %}
+            <span class="form-label">{{optionalContext}}</span>
+        {% endif %}
+        
+        {% for error in field.errors %}
+            <span class="invalid-feedback">{{ error }}</span>
+        {% endfor %}
+{% endmacro %}
+
+{% macro form_dropdown(field) %}
+        {{ field.label(class='form-label text-muted mb-0 mt-3') }}
+        
+        {{field(class="form-select" + (' is-invalid' if field.errors else ''), placeholder=field.label.text)}}
+        
+        {% for error in field.errors %}
+            <span class="invalid-feedback">{{ error }}</span>
+        {% endfor %}
+{% endmacro %}

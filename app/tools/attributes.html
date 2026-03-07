@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+
+<div class="container p-4 pt-1">
+    
+    <h2 class="text-center mb-4">Attribute stepxml generator</h2>
+
+    
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+
+        <!-- Buttons -->
+        <div class="d-flex mt-4 sticky-top border rounded p-2 justify-content-between" style="background-color: rgb(17, 98, 103);">
+            <div>
+                <a class="btn btn-primary" title="Add another" href="#" onclick="javascript:return addAttribute()"> <i class="bi bi-plus-circle"></i> </a>
+                
+            </div>
+            {{ form.submit(class="btn btn-success") }}
+            <div>
+                <a class="btn btn btn-danger" href="{{url_for('home')}}" onclick="return confirm('Do you want to reset this page?')" title="Reset Page"><i class="bi bi-x-circle-fill"></i></a>
+                <!-- <button class="btn btn-light theme-toggle" type="button" title="Change Theme">
+                    <i id="theme-toggle-icon" class="bi bi-palette-fill custom-navbar-icon text-primary"></i>
+                </button> -->
+            </div>
+        </div>
+
+        <!-- Inputs -->
+        <div id="all_attributes">
+            {% for dataPoint in form.attributes.entries %}
+            <div class="a_attribute">
+                <div class="a_color row border border-primary rounded p-2 g-2 mt-4">
+                    
+                    <div class="col-4">
+                        {{macroTemplate.form_field(dataPoint.form.a_id)}}
+                    </div>
+                    <div class="col-4">
+                        {{macroTemplate.form_field(dataPoint.form.a_name)}}
+                    </div>
+                    <div class="col-4">
+                        {{macroTemplate.form_field(dataPoint.form.ag_id)}}
+                    </div>
+                    
+
+                    
+                    <div class="col-4">
+                        {{macroTemplate.form_dropdown(dataPoint.form.a_type)}}
+                    </div>
+                    <div class="col-4">
+                        {{macroTemplate.form_dropdown(dataPoint.form.a_multivalued)}}
+                    </div>
+                    <div class="col-4">
+                        {{macroTemplate.form_dropdown(dataPoint.form.a_external)}}
+                    </div>
+
+
+                    
+                    <div class="col-4">
+                        {{macroTemplate.form_dropdown(dataPoint.form.a_validation)}}
+                    </div>
+
+                    <div class="col-8 mb-3">
+                        <div class="row">
+                            <span class="form-label text-muted mb-0 mt-3">
+                                Additional Data
+                            </span>
+                            
+                            <div class="col-12">
+                                {{macroTemplate.form_field(dataPoint.form.a_lov_id)}}
+                            </div>
+
+                            <div class="col-12">
+                                {{macroTemplate.form_field(dataPoint.form.a_max_length)}}
+                            </div>
+
+                            <div class="col-6">
+                                {{macroTemplate.form_field(dataPoint.form.a_min_value)}}
+                            </div>
+                            <div class="col-6">
+                                {{macroTemplate.form_field(dataPoint.form.a_max_value)}}
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    
+
+
+                    <div class="col-8">
+                        {{macroTemplate.form_field(dataPoint.form.a_purpose)}}
+                    </div>
+                    
+                    <div class="col-3">
+                        {{macroTemplate.form_field(dataPoint.form.a_valid_on)}}
+                    </div>
+                    
+                    <div class="col-1 text-end">
+                        <a class="btn btn-danger" id="att-del-button" onclick="deleteAttribute(this.id)"><i class="bi bi-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        
+
+    </form>
+</div>
+
+<!-- This Script makes the 'Add Attribute' button work -->
+<script>
+    function validationFieldChanged(field) {
+        const lov_id_field_class = field.id.replace("a_validation", "a_lov_id")
+        const max_value_field_class = field.id.replace("a_validation", "a_max_value")
+        const min_value_field_class = field.id.replace("a_validation", "a_min_value")
+        const max_length_field_class = field.id.replace("a_validation", "a_max_length")
+        
+        const lov_id_field = document.querySelector('#' + lov_id_field_class);
+        const max_value_field = document.querySelector('#' + max_value_field_class);
+        const min_value_field = document.querySelector('#' + min_value_field_class);
+        const max_length_field = document.querySelector('#' + max_length_field_class);
+        
+
+        if(field.value === "number") { 
+            lov_id_field.classList.remove('d-block');
+            lov_id_field.classList.add('d-none');
+            
+            max_length_field.classList.remove('d-block');           
+            max_length_field.classList.add('d-none');
+
+            min_value_field.classList.add('d-block');
+            min_value_field.classList.remove('d-none');
+            
+            max_value_field.classList.add('d-block');
+            max_value_field.classList.remove('d-none');
+        }
+        else if(field.value === "text") {
+            lov_id_field.classList.remove('d-block');
+            lov_id_field.classList.add('d-none');
+
+            min_value_field.classList.remove('d-block');
+            min_value_field.classList.add('d-none');
+            
+            max_value_field.classList.remove('d-block');
+            max_value_field.classList.add('d-none');
+
+            max_length_field.classList.add('d-block');
+            max_length_field.classList.remove('d-none');
+        }
+        else if(field.value === "lov") {
+            min_value_field.classList.remove('d-block');
+            min_value_field.classList.add('d-none');
+            
+            max_value_field.classList.remove('d-block');
+            max_value_field.classList.add('d-none');
+            
+            max_length_field.classList.remove('d-block');
+            max_length_field.classList.add('d-none');
+
+            lov_id_field.classList.add('d-block');
+            lov_id_field.classList.remove('d-none');
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const load_attribute_list = document.querySelectorAll('.a_attribute');
+        
+        for (load_attribute of load_attribute_list) {
+            console.log(load_attribute.id)
+            const load_firstatt_validation   = load_attribute.querySelector('[placeholder="Validation Base Type"]');
+            if(load_firstatt_validation) {
+                load_firstatt_validation.addEventListener('change', () => {
+                    validationFieldChanged(load_firstatt_validation);
+                });
+                validationFieldChanged(load_firstatt_validation);
+            }
+        }
+    });
+
+    function addAttribute() {
+        try{
+            const firstAttribute = document.querySelector('.a_attribute');
+            const newAttribute = document.createElement('div');
+            newAttribute.classList.add('a_attribute');
+            newAttribute.innerHTML = firstAttribute.innerHTML;
+
+            const newIndex = document.querySelectorAll('.a_attribute').length;
+
+            const color_div = newAttribute.querySelector('.a_color');
+            if (newIndex % 2 === 1) {
+                color_div.classList.remove('border-primary');
+                color_div.classList.add('border-warning');
+            }
+
+
+            // handle ID and naming scheme for flask-wtf form
+            const att_id   = newAttribute.querySelector('#attributes-0-a_id');
+            att_id.id      = `attributes-${newIndex}-a_id`;
+            att_id.name    = att_id.id;
+            att_id.value   = '';
+
+            const att_name   = newAttribute.querySelector('#attributes-0-a_name');
+            att_name.id      = `attributes-${newIndex}-a_name`;
+            att_name.name    = att_name.id;
+            att_name.value   = '';
+
+            const att_ag_id   = newAttribute.querySelector('#attributes-0-ag_id');
+            att_ag_id.id      = `attributes-${newIndex}-ag_id`;
+            att_ag_id.name    = att_ag_id.id;
+            att_ag_id.value   = '';
+            
+            const att_purpose   = newAttribute.querySelector('#attributes-0-a_purpose');
+            att_purpose.id      = `attributes-${newIndex}-a_purpose`;
+            att_purpose.name    = att_purpose.id;
+            att_purpose.value   = '';
+
+            const att_valid_on   = newAttribute.querySelector('#attributes-0-a_valid_on');
+            att_valid_on.id      = `attributes-${newIndex}-a_valid_on`;
+            att_valid_on.name    = att_valid_on.id;
+            att_valid_on.value   = '';
+
+            const att_type   = newAttribute.querySelector('#attributes-0-a_type');
+            att_type.id      = `attributes-${newIndex}-a_type`;
+            att_type.name    = att_type.id;
+
+            const att_multivalued   = newAttribute.querySelector('#attributes-0-a_multivalued');
+            att_multivalued.id      = `attributes-${newIndex}-a_multivalued`;
+            att_multivalued.name    = att_multivalued   .id;
+
+            const att_external   = newAttribute.querySelector('#attributes-0-a_external');
+            att_external.id      = `attributes-${newIndex}-a_external`;
+            att_external.name    = att_external.id;
+
+            const att_validation   = newAttribute.querySelector('#attributes-0-a_validation');
+            att_validation.id      = `attributes-${newIndex}-a_validation`;
+            att_validation.name    = att_validation.id;
+            att_validation.addEventListener('change', () => {
+                validationFieldChanged(att_validation);
+            });
+            const att_lov_id   = newAttribute.querySelector('#attributes-0-a_lov_id');
+            att_lov_id.id      = `attributes-${newIndex}-a_lov_id`;
+            att_lov_id.name    = att_lov_id.id;
+            att_lov_id.value   = '';
+
+            const att_max_length   = newAttribute.querySelector('#attributes-0-a_max_length');
+            att_max_length.id      = `attributes-${newIndex}-a_max_length`;
+            att_max_length.name    = att_max_length.id;
+            att_max_length.value   = '';
+
+            const att_min_value   = newAttribute.querySelector('#attributes-0-a_min_value');
+            att_min_value.id      = `attributes-${newIndex}-a_min_value`;
+            att_min_value.name    = att_min_value.id;
+            att_min_value.value   = '';
+
+            const att_max_value   = newAttribute.querySelector('#attributes-0-a_max_value');
+            att_max_value.id      = `attributes-${newIndex}-a_max_value`;
+            att_max_value.name    = att_max_value.id;
+            att_max_value.value   = '';
+            
+            const delete_button = newAttribute.querySelector("#att-del-button");
+            delete_button.id = `attributes-${newIndex}-delete_button`;
+
+            document.getElementById('all_attributes').appendChild(newAttribute);
+            return false;
+        }
+        catch(err){
+            window.alert(err);
+        }
+    }
+
+    function deleteAttribute(buttonID) {
+        
+        const element = document.getElementById(buttonID)
+        if (element.id === "att-del-button"){
+            window.alert("Cannot delete first attribute")
+        }
+        else {
+            element.parentElement.parentElement.parentElement.remove();
+        }
+    }
+
+</script>
+
+
+{% endblock %}

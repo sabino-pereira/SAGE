@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+    <div class="container-fluid">
+        
+        <!-- Main Page Header -->
+        <div class="justify-content-center d-flex border-bottom mt-2 mb-3">
+            <h2>Developer Tools </h2>  
+            <a href="{{url_for('docs.tools')}}" class="link-underline-primary ms-1"><i class="small bi bi-info-square"></i></a>
+        </div>
+        
+        <!-- Tools Form -->
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            
+            <!-- Top Bar of tools -->
+            <div class="row">
+                <div class="col-lg-6 col-12 mb-3">
+                    <div class="row">
+                        <div class="col-lg-10 col-9">
+                            <!-- Select Action Dropdown -->
+                            {{ macroTemplate.form_dropdown(form.action_type)}}
+                        </div>
+
+                        <!-- Popover explaining Tool Functions -->
+                        <div class="col-lg-2 col-3 d-flex flex-column">
+                            <button id="tool-info-popover" type="button" class="btn btn-custom-color custom-popover" data-bs-trigger="click" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-title="How to Use" data-bs-content="These are a collection of simple tools to perform common developer tasks."><i class="bi bi-question-square"></i></button>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Execute Button -->
+                <div class="col-lg-6 col-12">
+                    {{ form.submit(class="w-100 btn btn-success") }}
+                </div>
+            </div>
+
+            <br>
+            
+            <div class="row m-2 m-lg-0"> 
+                <!-- Input  -->
+                <div class="col-lg-6 col-12 mb-3">
+                    <div class="card border border-primary">
+                        <!-- Header with title -->
+                        <div class="card-header text-center text-bg-primary">
+                            Input Data
+                        </div>
+                        
+                        <!-- Body -->
+                        <div class="card-body p-0">
+                            {{macroTemplate.form_field(form.input_text)}}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output -->
+                <div class="col-lg-6 col-12 mb-3">
+                    <div class="card border border-primary h-100" style="max-height: 80vh;">
+                        <!-- Header with title -->
+                        <div class="card-header text-center text-bg-primary">
+                            Output
+                        </div>
+                        
+                        <!-- Body -->
+                        <div class="card-body overflow-auto">
+                                
+                            <!-- Buttons -->
+                            <div id="tools-output-buttons" class="row mt-2 sticky-top" style="display: {{block if return_dictionary else none}};">
+                                <div class="col-12 text-end"> 
+                                    <!-- Clear Button -->
+                                    <a type="button" class="btn btn-danger btn-sm me-2" href="{{url_for('core.reset_tools')}}"><i class="bi bi-x-circle"></i> Clear</a>
+                                    <!-- Copy Button -->
+                                    <span> {{macroTemplate.copy_text_button("tools-output") }} </span>
+                                </div>
+                            </div>
+                            
+                            
+                            <!-- Default Output -->
+                            <p id="tools-output-placeholder" class="fst-italic text-muted text-center mt-2" style="display: {{none if return_dictionary else block}};">Output will be printed here...</p>
+                            
+                            <!-- Output Data -->
+                            <pre id="tools-output" class="text-start mt-2" style="display: {{block if return_dictionary else none}};">
+                                {% if return_dictionary %}
+                                    <p class="text-start text-wrap" style="all: revert;">
+                                        {{return_dictionary["message"]|safe}}
+                                    </p>
+                                {% endif %}
+                            </pre>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Script to handle some tools in browser itself -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const submitButton = document.querySelector('input[type="submit"]');
+            const actionSelect = document.getElementById('action_type');
+            const inputText = document.getElementById('input_text');
+            const outputElement = document.getElementById('tools-output');
+            const outputElementButtons = document.getElementById('tools-output-buttons');
+            const outputPlaceholder = document.getElementById('tools-output-placeholder');
+
+            if (submitButton && actionSelect && inputText && outputElement) {
+                submitButton.addEventListener('click', async function(e) {
+                    const action = actionSelect.value;
+                    const interceptActionsList = ['js_beautify', 'xml_beautify']
+                    let processing_error = false;
+
+                    // hide placeholder element, and show output element
+                    outputPlaceholder.style.display = 'none';
+                    outputElement.style.display = 'block';
+                    outputElementButtons.style.display = 'block';
+
+                    // Intercept tools actions
+                    if (interceptActionsList.includes(action)) {
+                        // Stop form submission to server
+                        e.preventDefault(); 
+                        
+                        const code = inputText.value;
+                        let result = '';
+
+                        try {
+                            
+                            if(code.trim()){
+                                if (action === 'js_beautify') {
+                                    await loadJsBeautify();
+                                    // Use js-beautify library
+                                    result = js_beautify(code, { indent_with_tabs: true, space_in_empty_paren: true, brace_style: 'end-expand' });
+                                }
+
+                                else if (action === 'xml_beautify') {
+                                    // Use custom XML beautifier function
+                                    result = beautifyXml(code);
+                                }
+                            }
+                            else{
+                                result = "Empty Input";
+                                processing_error = true;
+                            }
+                        }
+                        catch (err) {
+                            result = err.message;
+                            processing_error = true;
+                        }
+                        
+                        finally {
+                            if (processing_error) {
+                                // On error, create the paragraph and set the error message as TEXT to prevent XSS.
+                                outputElement.innerHTML = `<span class='text-danger text-center'></span>`;
+                                outputElement.querySelector('span').textContent = "Error - " + result;
+                            } else {
+                                // On success, always use textContent to render the beautified code.
+                                // This prevents any potential script in the input from being executed.
+                                outputElement.textContent = result;
+                            }
+                        }
+                    }
+                });
+            }
+
+            function loadJsBeautify() {
+                return new Promise((resolve, reject) => {
+                    if (typeof js_beautify !== 'undefined') {
+                        resolve();
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify.min.js';
+                    script.onload = () => resolve();
+                    script.onerror = () => reject(new Error('Failed to load js-beautify script.'));
+                    document.head.appendChild(script);
+                });
+            }
+
+            // Helper function to beautify XML
+            function beautifyXml(xml) {
+                var formatted = '';
+                var reg = /(>)(<)(\/*)/g;
+                xml = xml.replace(/>\s*</g, "><");
+                xml = xml.replace(reg, '$1\r\n$2$3');
+                var pad = 0;
+                
+                xml.split('\r\n').forEach(function(node) {
+                    var indent = 0;
+                    if (node.match(/.+<\/\w[^>]*>$/)) {
+                        indent = 0;
+                    } 
+                    else if (node.match(/^<\/\w/)) {
+                        if (pad != 0) {
+                            pad -= 1;
+                        }
+                    } 
+                    else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+                        indent = 1;
+                    } 
+                    else {
+                        indent = 0;
+                    }
+
+                    var padding = new Array(pad + 1).join('    ');
+                    formatted += padding + node + '\r\n';
+                    pad += indent;
+                });
+                return formatted;
+            }
+        
+        });
+    </script>
+
+    <!-- Script to Enable Popover feature -->
+    <script>
+        window.onload = function() {
+            let popoverItem = document.getElementById("tool-info-popover");
+            
+            if (popoverItem) {
+                // Ensure Bootstrap is loaded before trying to use its JS features
+                if (typeof bootstrap !== 'undefined' && bootstrap.Popover) {
+                    let content = fetch("{{ url_for('static', filename='code_blocks/tool_descriptions.html') }}")
+                    .then(response => response.text())
+                    .then(text => {
+                        popoverItem.setAttribute("data-bs-content", text.trim());
+                        var newPopoverInstance = new bootstrap.Popover(popoverItem, {html: true, trigger: 'click'});
+
+                        // Close popover when clicking outside
+                        document.addEventListener('click', function (e) {
+                            // Check if click is outside the popover button and the popover body
+                            if (!popoverItem.contains(e.target) && !e.target.closest('.popover')) {
+                                newPopoverInstance.hide();
+                            }
+                        });
+                    });                    
+                } 
+            }
+        }
+    </script>
+
+{% endblock %}

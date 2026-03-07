@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+
+        <!-- Main Page Header -->
+        <div class="text-center mt-2 p-2">
+            <h1>Developer Tools</h1>
+            <p class="fs-5 text-muted">A reference guide for the suite of utilities designed to streamline common development tasks.</p>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="container card border mb-4">
+            <div class="fw-bold card-header fs-4">
+                Table of Contents
+            </div>
+            <ol class="text-start mt-2">
+                <li><a href="#overview" class="text-decoration-none">Overview</a></li>
+                <li><a href="#beautifiers" class="text-decoration-none">Code Beautifiers</a></li>
+                <li><a href="#ip-converters" class="text-decoration-none">IP List Converters</a></li>
+            </ol>
+        </div>
+
+        <br>
+
+        <section id="overview" class="mt-2">
+            <h2><a class="text-decoration-none" href="#overview">Overview</a></h2>
+            <p class="fs-5">The Developer Tools page provides a collection of utilities to handle common tasks like code formatting and data transformation. These tools are integrated directly into SAGE, eliminating the need to rely on external websites or third-party applications, which can be a security risk.</p>
+            <p class="fs-5">The interface is straightforward: select a tool from the dropdown menu, provide your data in the 'Input' panel, and click <strong>Execute</strong>. The processed data will appear in the 'Output' panel, ready to be copied.</p>
+            
+            <img src="{{ url_for('static', filename='img/ss-tools.png') }}" alt="Developer Tools Interface" class="img-fluid img-thumbnail m-2 border-info">
+        </section>
+
+        <br>
+        <hr>
+
+        <section id="beautifiers" class="mt-2">
+            <h2><a class="text-decoration-none" href="#beautifiers">Code Beautifiers</a></h2>
+            <p class="fs-5">These tools help format code to make it more readable and easier to debug.</p>
+
+            <h4 class="text-info mt-3">JavaScript Beautifier</h4>
+            <p class="fs-5">Ideal for formatting JavaScript code used in STEP Business Rules. Properly indented and formatted code is crucial for maintainability, especially when working with complex logic or when using the 'Edit Externally' feature with an IDE like VS Code.</p>
+
+            <h4 class="text-info mt-3">XML Beautifier</h4>
+            <p class="fs-5">This tool is essential for working with any XML-based configuration in STEP. Use it to format WebUI XML exports, STEPML files, or any other XML data to improve readability and easily identify structural issues.</p>
+
+            <div class="alert alert-info mt-3">
+                <strong>Client-Side Processing:</strong> Given the nature of these code inputs which can be easily 1000's of lines, both the JavaScript and XML beautifiers are run on client-side in your browser.
+            </div>
+        </section>
+
+        <br>
+        <hr>
+
+        <section id="ip-converters" class="mt-2">
+            <h2><a class="text-decoration-none" href="#ip-converters">IP List Converters</a></h2>
+            <p class="fs-5">These specialized tools simplify the management of IP whitelists in the STEP SaaS Self-Service Portal.</p>
+
+            <h4 class="text-info mt-3">CSV to STEP IP JSON</h4>
+            <p class="fs-5">This tool converts a simple comma-separated list of IP addresses and their descriptions into the specific JSON format required for bulk import into the portal's 'IP access control list'.</p>
+            <p class="fs-5">Provide your input with each entry on a new line in the format: <code>IP_ADDRESS,Description</code>. The tool will then generate the JSON content that you can save and import directly into the portal.</p>
+
+            <h4 class="text-info mt-3">STEP IP JSON to CSV</h4>
+            <p class="fs-5">This performs the reverse operation. If you export the IP list from the Self-Service Portal, it will be in a JSON format. Paste that JSON into the input box to convert it into a clean, human-readable CSV format. This is particularly useful for auditing purposes or for sharing the list with stakeholders.</p>
+        </section>
+        <br>
+    </div>
+{% endblock %}

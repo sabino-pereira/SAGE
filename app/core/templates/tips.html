@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+    <div class="container-fluid">
+
+        <!-- Main Page Header -->
+        <div class="justify-content-center d-flex border-bottom mt-2 mb-5">
+            <h2>Pro Tips</h2>  
+        </div>
+
+        <!-- Main Content -->
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <!-- Best Practises Section -->
+                <h3 class="text-muted mb-3"></i>Best Practices</h3>
+                <div class="accordion" id="proTipsAccordion">
+                    
+                    <!-- Naming Conventions -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                <i class="bi bi-card-checklist me-3 text-info"></i> Use Naming Conventions
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#proTipsAccordion">
+                            <div class="accordion-body">
+                                <p>Consistently applying naming conventions for all system objects (Attributes, Workflows, Integration Endpoints, etc.) is a foundational best practice.</p>
+                                <p>For example:</p>
+                                <ul>
+                                    <li>Attributes: <code>ATT_Product_Color</code></li>
+                                    <li>Workflows: <code>WF_Product_Approval</code></li>
+                                    <li>Inbound Integration Endpoint: <code>IIEP_Assets_Daily_Load</code></li>
+                                </ul>
+                                <p class="mb-0">This approach significantly improves clarity, making it easier to identify object types and filter them, especially when working outside the STEP workbench.</p>                             
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dedicated users -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <i class="bi bi-people-fill me-3 text-success"></i> Have dedicated users for each system task
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#proTipsAccordion">
+                            <div class="accordion-body">
+                                <p>Introduce a dedicated security group like 'Local Users' in the system for non-SSO users that perform automated or scheduled tasks. These users can be assigned specific permissions for running system-level activities like:</p>
+                                <ul>
+                                    <li>Integration Endpoints</li>
+                                    <li>Bulk Updates</li>
+                                    <li>Scheduled Processes / Business Rules</li>
+                                    <li>API Interactions</li>
+                                </ul>
+                                <p class="mb-0">The primary benefit is enhanced control over permissions and improved auditability, providing a clear trail of which system account initiated a change and why.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP Do Not's -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <i class="bi bi-slash-circle-fill me-3 text-danger"></i> STEP "Don'ts"
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#proTipsAccordion">
+                            <div class="accordion-body">
+                                <div class="list-group">
+                                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 fw-bold">Avoid broad Action Sets</h6>
+                                        </div>
+                                        <p class="mb-1">Break down Action Sets into smaller, more granular chunks (e.g., 'Change Name', 'Modify References', 'Modify Attributes'). This allows for finer control over user privileges, which is crucial in complex implementations.</p>
+                                    </div>
+                                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 fw-bold">Don't clutter the MAIN WebUI page</h6>
+                                        </div>
+                                        <p class="mb-1">While simple, adding all WebUI screen mappings to the MAIN page becomes unmanageable as the UI grows. Instead, create broad-level mappings on the MAIN page (e.g., one for all Products, one for Entities) that point to a 'Forwarding Screen'. You can then add more granular mappings within these forwarding screens for better organization.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stibo Community -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                <i class="bi bi-lightbulb-fill me-3 text-warning"></i> Join the Stibo STEP Community
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#proTipsAccordion">
+                            <div class="accordion-body">
+                                <p>If you haven't already, you should strongly consider joining the official <a href="https://community.stibosystems.com" target="_blank" class="fw-bold">Stibo STEP Community</a>.</p>
+                                <p>It is an invaluable resource for developers, serving as a dedicated hub for technical discussions, knowledge sharing, and feedback. By joining, you gain access to a global network of STEP professionals and Stibo experts.</p>
+                                <div class="alert alert-info mt-3 mb-0">
+                                    <i class="bi bi-info-circle-fill me-2"></i> If you have trouble signing up, contact your Stibo account manager or representative.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Designing the Web UI -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                <i class="bi bi-palette-fill me-3 text-primary"></i> Web UI Design Tips
+                            </button>
+                        </h2>
+                        <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#proTipsAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Configure the sidebar for majority of the navigation. Group similar items together using the 'Menu Group' component.</li>
+                                    <li>Reserver the main 'Home' screens for help text and overall platform information. For specific information, create other 'Homepage' screens.</li>
+                                    <li>For 'Node Details' screens, the 'Summary Card' component is the best header usually.</li>
+                                    <li>Use a naming scheme for your screens to avoid confusion later.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+
+                <!-- How-To's Section -->
+                <h3 class="text-muted mt-5 mb-3"></i>How-To's</h3>
+                <div class="accordion" id="howTosAccordion">
+                    
+                    <!-- Quotes Widget -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneHt" aria-expanded="false" aria-controls="collapseOneHt">
+                                <i class="bi bi-chat-quote-fill me-3"></i> Add a 'Quotes' widget in the Web UI
+                            </button>
+                        </h2>
+                        <div id="collapseOneHt" class="accordion-collapse collapse" data-bs-parent="#howTosAccordion">
+                            <div class="accordion-body">
+                                <p>Add a bit of fun to your WebUI homepage with a dynamic "Quotes Widget" using the "Custom HTML" component.</p>
+                                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    <div>
+                                        This uses embedded HTML and JavaScript. While generally safe, it's not an officially supported method, so use it at your own risk.
+                                    </div>
+                                </div>
+                                <strong>Steps:</strong>
+                                <ol class="list-group list-group-numbered mt-2">
+                                    <li class="list-group-item">In Design Mode, go to a Screen of type 'Homepage'.</li>
+                                    <li class="list-group-item">In Child Components, add a new 'Widget Grid'.</li>
+                                    <li class="list-group-item">Open this Widget Grid, and in Child Components, add a new 'Links Widget'.</li>
+                                    <li class="list-group-item">Open this Links Widget and set its title as ' Quotes' (with a leading space). Then in 'Rows' add a new 'Static HTML' component.</li>
+                                    <li class="list-group-item">Copy the code below and paste it inside the Static HTML component.</li>
+                                    <li class="list-group-item">'Save and Close' design mode.</li>
+                                    <li class="list-group-item">You can add new quotes in the format indicated in the code. Make sure to not include double quotes (") and replace any single quotes (') with a backquote (`) to avoid errors.</li>
+                                </ol>
+                                
+                                <div class="text-end pt-3 pb-1"> {{macroTemplate.copy_text_button("quotes-widget-code") }} </div>
+                                
+                                <div class="border rounded p-2">
+                                    <pre id="quotes-widget-code" class="mb-0"><code>Loading code...</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Server SFTP Connectivity -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwoHt" aria-expanded="false" aria-controls="collapseTwoHt">
+                                <i class="bi bi-server me-3"></i> Integrate a VM or Server with STEP
+                            </button>
+                        </h2>
+                        <div id="collapseTwoHt" class="accordion-collapse collapse" data-bs-parent="#howTosAccordion">
+                            <div class="accordion-body">
+                                <p>Here's how to integrate an external Linux Server/VM with your STEP instance for file transfers.</p>
+                                <div class="alert alert-secondary d-flex align-items-center" role="alert">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    <div>
+                                        These are Linux-only instructions. The concepts are similar for Windows, but the tools will differ.
+                                    </div>
+                                </div>
+
+                                <strong>Pre-Requisites:</strong>
+                                <ol class="list-group list-group-numbered mt-2">
+                                    <li class="list-group-item">Ensure your server has <b>SSH and SCP</b> available and enabled.</li>              
+                                    <li class="list-group-item">Whitelist your server's external IP in the Self-Service Portal (SaaS) under 'SFTP access control -> IP access control list'.</li>
+                                    <li class="list-group-item">Generate a new SSH key pair (e.g., RSA or EdDSA-Ed25519). Ensure the public key is in the <b>OpenSSH format</b>.</li>
+                                    <li class="list-group-item">In the self-service portal, add a new Account under 'SFTP access control -> Accounts', choosing a username and uploading your public key.</li>
+                                    <li class="list-group-item">Create your target hotfolder directory under the STEP system's <code>/upload/hotfolder/</code> path.</li>
+                                </ol>
+
+                                <strong class="d-block mt-3">Connection Steps:</strong>
+                                <ol class="list-group list-group-numbered mt-2">
+                                    <li class="list-group-item">On your server, place the SSH private key in a secure directory like <code>~/.ssh/keys/</code>.</li>
+                                    <li class="list-group-item">Add a new entry to your <code>~/.ssh/config</code> file:
+                                        <div class="card mt-2">
+                                            <div class="card-body p-2">
+                                                <pre class="mb-0"><code>Host &lt;system-alias&gt;
+    HostName &lt;system-sftp-url&gt;
+    User &lt;sftp-username&gt;
+    IdentityFile ~/.ssh/keys/&lt;sftp-private-key-name&gt;</code></pre>
+                                            </div>
+                                        </div>
+                                        <ul class="mt-2 small text-muted">
+                                            <li><b>system-alias:</b> A short, memorable name for your connection.</li>
+                                            <li><b>system-sftp-url:</b> Found in the self-service portal (e.g., <code>your-system-sftp.mdm.stibosystems.com</code>).</li>
+                                        </ul>
+                                    </li>
+                                    <li class="list-group-item">Use <code>scp</code> to transfer files:
+                                        <pre class="mt-2"><code>scp /path/to/local/file &lt;system-alias&gt;:/upload/hotfolders/&lt;your-hotfolder&gt;/</code></pre>
+                                    </li>
+                                    <li class="list-group-item">Automate this process by adding the command to a shell script and scheduling it with <code>cron</code>. For example, to run daily at 10 AM:
+                                        <pre class="mt-2"><code># Open crontab for editing
+crontab -e
+
+# Add this line
+0 10 * * * /home/user/your-script.sh</code></pre>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Use Tools -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThreeHt" aria-expanded="false" aria-controls="collapseThreeHt">
+                                <i class="bi bi-tools me-3"></i> Essential Daily Tools
+                            </button>
+                        </h2>
+                        <div id="collapseThreeHt" class="accordion-collapse collapse" data-bs-parent="#howTosAccordion">
+                            <div class="accordion-body">
+                                <div class="list-group">
+                                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 fw-bold">WinSCP</h6>
+                                        </div>
+                                        <p class="mb-1">An indispensable tool for connecting to the STEP SFTP server to view and manage files. Configure a new session using the SFTP protocol, your system's SFTP URL, and the username created in the self-service portal. Instead of a password, use the 'Advanced' settings to point to your private SSH key file for authentication.</p>
+                                    </div>
+                                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 fw-bold">Visual Studio Code</h6>
+                                        </div>
+                                        <p class="mb-1">Use the 'Edit Externally' feature in the Business Rule workbench to open JavaScript code directly in VS Code. Stibo provides extensions that enable STEP API autocompletion, making it a powerful and efficient editor for development.</p>
+                                    </div>
+                                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 fw-bold">Notepad++</h6>
+                                        </div>
+                                        <p class="mb-1">A lightweight yet powerful text editor that is excellent for working with large STEP XML exports, WebUI configurations, and JavaScript files. Its syntax highlighting and performance with large files make it a must-have.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- More Coming Soon -->
+        <div class="text-center p-5 my-4 rounded-3">
+            <i class="bi bi-hourglass-split text-muted" style="font-size: 3rem;"></i>
+            <h4 class="text-muted mt-3">More Coming Soon...</h4>
+        </div>
+
+    </div>
+
+
+    <!--Script to fetch content for static file on page load (extend as needed)-->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Fetch 'Quotes Widget' html code from static file
+            const quotesWidgetElement = document.getElementById('quotes-widget-code').querySelector('code');
+            fetch("{{ url_for('static', filename='code_blocks/quotes_widget.txt') }}")
+                .then(response => response.text())
+                .then(text => {
+                    if (quotesWidgetElement) {
+                        quotesWidgetElement.textContent = text.trim();
+                    }
+                });
+        });
+    </script>
+
+{% endblock %}

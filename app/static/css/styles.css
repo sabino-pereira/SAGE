@@ -1,0 +1,178 @@
+/* Custom Font */
+/* @import url('https://fonts.googleapis.com/css2?family=Comic+Relief&display=swap');
+:root {
+  --bs-body-font-family: "Comic Relief", cursive, sans-serif;
+}  */
+
+
+/* This makes the section link scrolling work properly in documentation pages as top navbar is fixed */
+html {
+  scroll-padding-top: 80px;
+  scroll-behavior: smooth
+}
+
+/* Adds styling to the top left Logo/Homepage link */
+#custom-logo:active {
+  border: 1px dashed;
+  border-radius: 5px;
+}
+
+.custom-brand-color {
+  color: #FF7F50;
+}
+
+.custom-navbar-icon {
+  font-size: 1.5em;
+}
+
+.custom-docs-icon {
+  font-size: 3em;
+}
+
+.custom-docs-card {
+  transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+}
+
+.custom-docs-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.custom-user-dropdown-large {
+  width: 70vw;
+}
+
+.custom-user-dropdown-small {
+  width: 20vw;
+}
+
+.custom-footer{
+  border-left: 5px #FF7F50 solid;
+  border-right: 5px #FF7F50 solid;
+  border-radius: 10px;
+}
+
+.custom-links-card{
+  max-height: 200px; 
+  overflow-y: auto;
+}
+
+.custom-homepage-links-card:hover{
+  border: 2px solid;
+  transform: translateY(-3px);
+}
+
+
+.btn-custom-color {
+  background-color: #FF7F50;
+  border-color: #ec6c3e;
+  color: black;
+}
+
+.btn-custom-color:hover {
+  background-color: #ec6c3e;
+  border-color: #FF7F50;
+}
+
+
+/* Pop-over styling, used in tools page */
+.popover {
+  border-color: #FF7F50;
+  max-width: 80vw; 
+}
+.popover-header {
+  background-color: #FF7F50;
+}
+.popover-arrow::after {
+  border-bottom-color: #FF7F50 !important;
+  border-top-color: #FF7F50 !important;
+}
+
+
+/* This will make the content that was copied from the button glow for a second */
+.glow-active {
+  border-radius: 5px;
+  box-shadow: 0 0 10px #0073e6,
+              0 0 20px #0073e6,
+              0 0 40px #0073e6;
+}
+
+/* Set scrollbar height to navbar on smaller screens */
+#custom-navbar-links-container{
+  --bs-scroll-height: 30vh;
+}
+
+
+/* Animation for color change element */
+@keyframes color-change {
+    0% { color: var(--bs-primary); }
+    25% { color: var(--bs-success); }
+    50% { color: var(--bs-warning); }
+    75% { color: var(--bs-danger); }
+    100% { color: var(--bs-primary); }
+}
+
+/* Styling the Rest API page loading icon */
+.loading-icon-wrapper {
+    animation: color-change 4s linear infinite;
+}
+
+/* Styling for graphql page buttons */
+.custom-graphql-button{
+  width: 45%;
+}
+
+/* Styling for input collapse button and elements */
+/* Sidebar Animation */
+#api-input-toggle {
+    transition: transform 1s ease-out;
+    opacity: 1;
+    overflow: hidden;
+}
+
+#api-input-toggle.collapsed {
+    transform: translateX(-100%);
+    flex: 0 0 0% !important;
+    max-width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    opacity: 0;
+}
+
+
+
+/* Override Bootstrap Theme colors */
+[data-bs-theme="dark"] {
+  --bs-body-bg: rgba(0, 0, 0, 1);
+  
+  /* Override Navbar color */
+  #custom-navbar {
+    background-color: #0b4f34 !important;
+  }
+
+  .form-select option {
+    background-color: rgba(0, 50, 50, 1) !important;
+  }
+
+  .custom-user-dropdown-menu {
+    background-color: rgba(0, 0, 0, .9);
+  }
+
+}
+
+[data-bs-theme="light"] {
+  --bs-body-bg: rgba(255, 255, 255, 1);
+
+  /* Override Navbar and dropdown menu Color */
+  #custom-navbar {
+    background-color: #1ccc86 !important;
+  }
+
+  .form-select option {
+    background-color: rgba(0, 121, 107, 1) !important;
+  }
+
+  .custom-user-dropdown-menu {
+    background: rgba(255, 255, 255, .9);
+  }
+}

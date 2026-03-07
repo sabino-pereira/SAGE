@@ -1,0 +1,305 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "STEP Remote System Administration",
+    "description": "Interface for remote system management for clients without server file system access.\u003Cbr/\u003EThe 'System Administration' user privilege is required for all resource operations.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/system-management"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": [],
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/step/restart": {
+      "post": {
+        "tags": [
+          "Server Restart"
+        ],
+        "summary": "Restarts the STEP system",
+        "description": "Endpoint for restarting the STEP system. Notice that as the Remote System Administration API and the Swagger UI is served by the STEP system, both will be unavailable until the system has been started again.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Server is about to be restarted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterRestartResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/step/extensions": {
+      "get": {
+        "tags": [
+          "STEP Extensions"
+        ],
+        "summary": "Gets extension metadata",
+        "description": "Endpoint for getting information about which extensions are configured to be installed on the STEP system. The 'source' query parameter determines whether the returned information shows the currently effective list of extensions (value 'current', default) or the list that will be in effect after the next restart (value 'desired').",
+        "parameters": [
+          {
+            "name": "source",
+            "description": "Source of the extensions metadata. Can be either \"current\" (to list currently applied extensions metadata) or \"desired\" (to list extensions metadata that will be applied on next restart)",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "[current|desired]",
+              "default": "current"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of saved extensions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExtensionMetadata"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "STEP Extensions"
+        ],
+        "summary": "Sets the desired list of extensions",
+        "description": "Endpoint for specifying which extensions should be deployed on the STEP system as part of the next system restart. Body must be an array of strings, where each supplied string is a valid recipe for the extension on the Stibo Systems \"updates\" server. Notice that the list is overwritten with each request. I.e. the full list of desired extensions must be provided with each request. Use GET /step/extensions to get the current list.\u003Cbr/\u003EWill return 403 if the extension developer is not trusted on the STEP system. Use the information provided in the 403 response with the PUT /step/extensions/partner/trust/{certificate-id} endpoint to establish this trust.",
+        "requestBody": {
+          "description": "List of extension recipes",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Single extension recipe"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The recipes were correctly saved and will be applied after a server restart",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PutExtensionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid recipe has been provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not all partner's certificates are trusted. It's forbidden to put such recipes on system until the partner certificates are marked as trusted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/step/extensions/partner/trust/{certificate-id}": {
+      "put": {
+        "tags": [
+          "STEP Extensions"
+        ],
+        "summary": "Establishes trust for a specific developer party",
+        "description": "Endpoint for trusting a specific developer party. The certificate ID to be passed in the URL will be returned in 403 responses for the PUT /step/extensions endpoint in the case where the developer behind an extension is not already trusted on the STEP system.",
+        "parameters": [
+          {
+            "name": "certificate-id",
+            "description": "Id of the partner certificate to trust",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The trust to partner certificate has been correctly established",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtensionPartnerTrustResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid partner certificate has been provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ClusterRestartResponse": {
+        "type": "object",
+        "description": "Response for STEP system restart operation",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Message of the response",
+            "readOnly": true
+          }
+        }
+      },
+      "ExtensionMetadata": {
+        "type": "object",
+        "description": "Extension metadata definition",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the extension component",
+            "readOnly": true
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the extension component",
+            "readOnly": true
+          },
+          "recipe": {
+            "type": "string",
+            "description": "Recipe url of the extension component",
+            "readOnly": true
+          },
+          "hash": {
+            "type": "string",
+            "description": "Checksum of the extension component",
+            "readOnly": true
+          }
+        }
+      },
+      "ExtensionPartnerCertificate": {
+        "type": "object",
+        "description": "Response for putting extensions metadata operation",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id of the partner certificate",
+            "readOnly": true
+          },
+          "trusted": {
+            "type": "boolean",
+            "description": "Boolean indicating whether current partner certificate is trusted by system"
+          },
+          "componentRecipe": {
+            "type": "string",
+            "description": "Recipe url of the component signed by partner certificate",
+            "readOnly": true
+          }
+        }
+      },
+      "ExtensionPartnerTrustResponse": {
+        "type": "object",
+        "description": "Response for putting extension partner certificate trust",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Message of the response",
+            "readOnly": true
+          }
+        }
+      },
+      "PutExtensionsResponse": {
+        "type": "object",
+        "description": "Response for putting extensions metadata operation",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Message of the response",
+            "readOnly": true
+          }
+        }
+      },
+      "PutExtensionsTrustRequiredResponse": {
+        "type": "object",
+        "description": "Error response for putting extensions metadata operation, when obtaining trust to selected partner is required",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Message of the response",
+            "readOnly": true
+          },
+          "certificatesToTrust": {
+            "type": "object",
+            "description": "List of certificates to trust",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ExtensionPartnerCertificate"
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "httpStatus": {
+            "type": "integer",
+            "description": "The HTTP status code",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "Extended error information. Notice that error messages may change without warning and that programming logic should not rely upon the content of the message."
+          },
+          "httpReason": {
+            "type": "string",
+            "description": "The name of the HTTP status code"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

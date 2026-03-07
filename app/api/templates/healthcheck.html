@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    <!-- Main Page Header -->
+    <div class="justify-content-center d-flex border-bottom mt-2 mb-3">
+        <h2>Healthchecks</h2>  
+        <a href="{{url_for('docs.monitoring', _anchor='healthchecks')}}" class="link-underline-primary ms-1"><i class="small bi bi-info-square"></i></a>
+    </div>
+
+    {% if not healthcheck_dictionary_list %}
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="card mt-4 border">
+                <div class="card-body">
+                    <div class="row g-1 justify-content-center">
+                        <div class="col-12 text-center">
+                            <label class="col-form-label">Fetch healthcheck data for the last:</label>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            {{ macroTemplate.form_field(form.input_number, "") }}
+                        </div>
+                        <div class="col-12 col-md-3">
+                            {{ macroTemplate.form_field(form.time_unit, "") }}
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <button type="submit" class="btn btn-success w-100" onclick="showLoadingIcon('healthcheck-output-container')"><i class="bi bi-play-fill"></i> Fetch</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+    <div class= "mt-4" id="healthcheck-output-container">
+        
+        {% if healthcheck_dictionary_list %}
+            <div class="row g-2">
+                <!-- Output Header -->
+                <div class="col-12 col-md-6 text-center text-md-start mb-3">
+                    <h4 class="text-muted fst-italic mb-0">Healthchecks performed in the last <span class="fw-bold">{{days_input}}</span></h4>
+                </div>
+                <!-- Clear Button -->
+                <div class="col-12 col-md-6 text-center text-md-end mb-3">
+                    <a type="button" class="btn btn-danger btn-sm" href="{{url_for('api.clear_api')}}"><i class="bi bi-x-circle"></i> Reset Page</a>
+                </div>                
+            </div>
+
+            <!-- Filters Accordion -->
+            <div class="accordion" id="filtersAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilters" aria-expanded="false" aria-controls="collapseFilters">
+                            Filters
+                        </button>
+                    </h2>
+                    <div id="collapseFilters" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+                        <div class="accordion-body">
+                            <div class="row g-4 mb-3">
+                                <div class="col-12 col-md-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-funnel me-2"></i> Status</span>
+                                        <select class="form-select" id="statusFilter">
+                                            <option value="All" selected>All</option>
+                                            <option value="Succeeded">Succeeded</option>
+                                            <option value="Failed">Failed</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-funnel me-2"></i> Severity</span>
+                                        <select class="form-select" id="severityFilter">
+                                            <option value="All" selected>All</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Critical">Critical</option>
+                                            <option value="High">High</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-funnel me-2"></i> Category</span>
+                                        <select class="form-select" id="categoryFilter">
+                                            <option value="All" selected>All</option>
+                                            <option value="Configuration">Configuration</option>
+                                            <option value="Performance">Performance</option>
+                                            <option value="Data Errors">Data Errors</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="input-group-text bg-transparent border-0">
+                                        <div class="form-check form-switch ">
+                                            <input class="form-check-input ms-auto me-2" type="checkbox" role="switch" id="issueFoundFilter">
+                                            <label class="form-check-label" for="issueFoundFilter">Issues Found</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Output -->
+            <div class="row g-4 mt-4" >
+                <!-- Check if the output dictionary is not a list i.e. some error occured and no healthchecks are returned -->
+                {% if healthcheck_dictionary_list is string %}
+                    <div class="col-12 text-center">
+                        {{ healthcheck_dictionary_list|safe }}
+                    </div>
+                {% else %}
+                    {% for check in healthcheck_dictionary_list %}
+                        <div class="col-12 col-md-6 col-lg-4 healthcheck-card" data-status="{{check.status}}" data-severity="{{check.severity}}" data-category="{{check.category}}" data-issues="{{check.issueCount}}">
+                            <div class="card h-100 shadow-sm border-secondary">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div class="text-truncate fw-bold pe-2" title="{{ check.ID }}">
+                                        {{ check.name }}
+                                    </div>
+                                    {% if check.status == 'Succeeded' %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Succeeded</span>
+                                    {% elif check.status == 'Failed' %}
+                                        <span class="badge bg-danger"><i class="bi bi-exclamation-octagon me-1"></i>Failed</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ check.status }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-2">
+                                        <div class="col-6 text-center">
+                                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Category</small>
+                                            <span class="fw-medium text-break">{{ check.category }}</span>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Severity</small>
+                                            <span class="fw-medium">{{ check.severity }}</span>
+                                        </div>
+                                        <div class="col-12 mt-3 text-center">
+                                            <div>
+                                                <span class="{{ 'text-success' if check.issueCount == 0 else 'text-danger' }}">{{ check.issueCount }} Issues Found</span>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent text-muted small border-0 pt-0">
+                                    <hr class="mt-0 mb-2 opacity-25">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-clock me-1"></i> {{ moment(check.time).fromNow() }}</span>
+                                        <span>{{ moment(check.time).format('LLL') }}<span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="text-center text-muted mt-4">
+                <i class="bi bi-clock-history" style="font-size: 3rem;"></i>
+                <p class="card-text mt-2">Click the 'Fetch' button above to load healthcheck data.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- This script filters the healthchecks cards -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusFilter = document.getElementById('statusFilter');
+        const severityFilter = document.getElementById('severityFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const issueFoundFilter = document.getElementById('issueFoundFilter');
+        const cards = document.querySelectorAll('.healthcheck-card');
+
+        function filterCards() {
+            const statusValue = statusFilter.value;
+            const severityValue = severityFilter.value;
+            const categoryValue = categoryFilter.value;
+            const issueFoundValue = issueFoundFilter.checked;
+
+            cards.forEach(card => {
+                const status = card.getAttribute('data-status');
+                const severity = card.getAttribute('data-severity');
+                const category = card.getAttribute('data-category');
+                const issueCount = card.getAttribute('data-issues');
+
+                const statusMatch = (statusValue === 'All') || (status === statusValue);
+                const severityMatch = (severityValue === 'All') || (severity === severityValue);
+                const categoryMatch = (categoryValue === 'All') || (category === categoryValue);
+                const issueMatch = !issueFoundValue || (issueCount != '0');
+
+                if (statusMatch && severityMatch && categoryMatch && issueMatch) {
+                    card.style.display = '';
+                } 
+                else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        if(statusFilter && severityFilter && categoryFilter && issueFoundFilter){
+            statusFilter.addEventListener('change', filterCards);
+            severityFilter.addEventListener('change', filterCards);
+            categoryFilter.addEventListener('change', filterCards);
+            issueFoundFilter.addEventListener('change', filterCards);
+
+            // Apply filters on page load to handle browser-restored values or defaults
+            filterCards();
+        }
+    });
+</script>
+
+{% endblock %}

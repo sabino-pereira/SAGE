@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+    <div class="container-fluid">
+        <!-- Main Page Header -->
+        <div class="justify-content-center d-flex border-bottom mt-2">
+            <h2>Sensor Details</h2>  
+        </div>
+        
+        {% if not errorOccured %}
+            
+            <table class="table table-hover" id="custom-details-table">
+                <tbody class="table-group-divider">
+                    {% for key, value in processed_data.items() %}
+                        {% if key.strip() %}
+                        <tr class="text-center">
+                            <td> 
+                                <strong>
+                                    {{key}}
+                                </strong>
+                            </td>
+                            <td class="text-break">
+                                {{value|safe}}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            
+        {% else %}
+            
+            <div class="text-danger mb-2">
+                <strong>Error:</strong> Could not load Sensor details.
+            </div>
+
+            <div class="text-muted mb-4">
+                Details: {{error}}
+            </div>
+
+            <div class="d-grid gap-2 col-4 mx-auto">
+                <button class="btn btn-success btn-lg mb-4" type="button" onclick="window.location.reload()">Retry</button>
+                <a href="{{ url_for('core.home') }}" class="btn btn-primary btn-lg">Go to Homepage</a>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container-fluid d-flex flex-column justify-content-center align-items-center text-center" style="height: 80vh;">
+        <!-- Error Icon -->
+        <div class="mb-4">
+            <i class="bi bi-hdd-stack-fill text-danger" style="font-size: 6rem;"></i>
+        </div>
+
+        <!-- Error Text -->
+        <h1 class="display-1 fw-bold">413</h1>
+        <h2 class="mb-2">Payload Too Large</h2>
+        <p class="mb-5">Your request is larger than the server is willing or able to process.</p>
+        
+        <!-- Home Button -->
+        <a href="{{ url_for('core.home') }}" class="btn btn-primary btn-lg">Go to Homepage</a>
+    </div>
+
+{% endblock %}

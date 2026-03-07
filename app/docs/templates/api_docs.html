@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+
+        <!-- Main Page Header -->
+        <div class="text-center mt-2 p-2">
+            <h1>APIs</h1>
+            <p class="fs-5 text-muted">This guide covers how to use the API tools provided by SAGE.</p>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="container card border mb-4">
+            <div class="fw-bold card-header fs-4">
+                Table of Contents
+            </div>
+            <ol class="text-start mt-2">
+                <li><a href="#authentication" class="text-decoration-none">API Authentication</a></li>
+                <li><a href="#rest-api" class="text-decoration-none">REST API Interface</a></li>
+                <li><a href="#graphql" class="text-decoration-none">GraphQL Interface</a></li>
+                <li><a href="#console" class="text-decoration-none">Console Actions</a></li>
+            </ol>
+        </div>
+
+        <br>
+
+        <section id="authentication" class="mt-2">
+            <h2><a class="text-decoration-none" href="#authentication">API Authentication</a></h2>
+            <p class="fs-5">API access is authenticated using credentials from a configured STEP user account. When you add a system in SAGE, you provide the <strong>User ID</strong> and <strong>Password</strong> for this account. For simplicity, using a dedicated local service account in STEP with only the necessary privileges is highly recommended. SAGE does not support STEP accounts using SSO yet.</p>
+            <p class="fs-5">The first time you use an API feature for a system, SAGE uses these credentials to request a bearer token from STEP. This token is then cached to expedite subsequent API calls. Since bearer tokens have a limited lifespan, SAGE automatically handles token expiration by requesting a new one when the current token is no longer valid. The logic behind this is the TTL or 'time to live' of the token. So if a token is older than the TTL defined, it's automatically discarded and a new one is requested. The default TTL for a token is 5 minutes.</p>
+            
+            <h4 class="text-info">Runtime Configuration</h4>
+            <p class="fs-5">Each API page features a <strong>'Configuration'</strong> accordion at the top. This section, collapsed by default, displays the default User ID, Context, and Workspace that were configured when the system was added. For one-off operations, you can temporarily override these default settings directly within the accordion. This allows you to execute a specific action with different user credentials or a different context without changing the system's primary configuration.</p>
+            
+            <img src="{{ url_for('static', filename='img/ss-config-accordion.png') }}" alt="Configuration Accordion" class="img-fluid img-thumbnail m-2 border-info">
+
+            <div class="alert alert-warning">
+                <strong>Important:</strong> Any changes made in the 'Configuration' accordion are temporary and apply only to the current session. To make permanent changes, please edit the system on the <a href="{{url_for('core.systems')}}" class="alert-link">Systems</a> page.
+            </div>
+        </section>
+        
+        <br>
+        <hr>
+        
+        <section id="rest-api" class="mt-2">
+            <h2><a class="text-decoration-none" href="#rest-api">REST API Interface</a></h2>
+            <p class="fs-5">SAGE provides a user-friendly interface for interacting with the Stibo STEP <code>REST API v2</code>. This feature, accessible from the main navigation under <strong>APIs &gt; REST API</strong>, simplifies the process of executing REST API calls against your configured system.</p>
+            <p class="fs-5">The page is organized into three main parts: the 'Configuration' accordion for authentication settings, the request builder, and the 'Output' panel to display results.</p>
+            
+            <h5>Constructing a Request</h5>
+            <p class="fs-5">Within the request builder, you can construct your API call by selecting:</p>
+            <ul>
+                <li>The <strong>HTTP method</strong> (e.g., <code>GET</code>, <code>POST</code>, <code>DELETE</code>).</li>
+                <li>The <strong>API endpoint</strong> and resource category (e.g., Assets, Products, Users).</li>
+                <li>The specific <strong>operation</strong> you wish to perform.</li>
+            </ul>
+            <p class="fs-5">The interface is dynamic; as you select different operations, relevant input fields for parameters like object IDs will appear automatically. For methods like <code>POST</code> or <code>PUT</code> that require a payload, a 'Request Body' editor will be provided for you to enter your JSON data.</p>
+            
+            <h4 class="text-info">Executing and Viewing Output</h4>
+            <p class="fs-5">Once your request is configured, click <strong>Execute</strong>. The response from the STEP system will be displayed in the 'Output' section below, complete with a 'Copy' button for convenience.</p>
+
+            <img src="{{ url_for('static', filename='img/ss-rest-api.png') }}" alt="REST API Example" class="img-fluid img-thumbnail m-2 border-info">
+        
+        </section>
+        
+        <br>
+        <hr>
+
+        <section id="graphql" class="mt-2">
+            <h2><a class="text-decoration-none" href="#graphql">GraphQL Interface</a></h2>
+            <p class="fs-5">In addition to the REST API, SAGE includes a powerful interface for executing GraphQL queries against your STEP system. The layout is consistent with the REST API page, featuring the 'Configuration' accordion and an 'Output' panel. The central component is the GraphQL query editor.</p>
+            <p class="fs-5">The editor comes pre-populated with a sample query to help you get started. You can test the connection by replacing the placeholder ID with a valid Product ID from your STEP system and executing the query.</p>
+            
+            <div class="alert alert-info">
+                <strong>Dynamic Placeholders:</strong> To use the context and workspace defined in the 'Configuration' accordion, use the placeholders <code>"&lt;dynamic-context&gt;"</code> and <code>"&lt;dynamic-workspace&gt;"</code> in your query. SAGE will substitute these with the active settings at runtime.
+            </div>
+
+            <p class="fs-5">A <strong>'Prettify'</strong> button is available to automatically format your GraphQL query, which helps improve readability and catch syntax errors. After crafting your query, click <strong>'Execute'</strong> to run it and view the results in the 'Output' section.</p>
+
+            <img src="{{ url_for('static', filename='img/ss-graphql.png') }}" alt="GraphQL Example" class="img-fluid img-thumbnail m-2 border-info">
+        </section>
+        
+        <br>
+        <hr>
+
+        <section id="console" class="mt-2">
+            <h2><a class="text-decoration-none" href="#console">Console Actions</a></h2>
+            <p class="fs-5">The Console is a unique SAGE feature that provides a simplified, task-oriented control panel. It leverages a combination of REST and GraphQL APIs to offer pre-defined actions, abstracting away the complexity of raw API calls for common administrative tasks.</p>
+            <p class="fs-5">The main area of the page consists of several expandable sections, each dedicated to a specific task. Each section provides a clear description of its function and a simple interface—often just a button or a dropdown—to perform the action. This allows for powerful operations to be performed with a single click.</p>
+
+            <img src="{{ url_for('static', filename='img/ss-console.png') }}" alt="Console Example" class="img-fluid img-thumbnail m-2 border-info">
+
+            <div class="alert alert-danger">
+                <strong><span class="bi bi-exclamation-triangle-fill"></span> Caution:</strong> Many actions available in the Console are powerful and can be disruptive (e.g., restarting a server). Please exercise extreme care and ensure you understand the consequence of an action before executing it.
+            </div>
+        </section>
+        
+        <br>
+        <hr>
+        
+        <br>
+    </div>
+{% endblock %}

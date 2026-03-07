@@ -1,0 +1,454 @@
+<!doctype html>
+
+<html lang="en">
+  
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        {% if title %}
+            <title>{{app_name}} - {{title}}</title>
+        {% else %}
+            <title>{{app_name}}</title>
+        {% endif %}
+        
+        <!-- Bootstrap Min CSS Stylesheet -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        
+        <!-- Bootstrap Icons Stylesheet -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+        
+        <!-- Custom CSS Stylesheet -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        
+        <!-- Custom Favicon -->
+        <link rel="icon" href="{{ url_for('static', filename='img/logo.svg') }}" type="image/x-icon">
+    </head>
+
+    <body>   
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-expand-lg border rounded mt-3 ms-2 me-2 sticky-top" id="custom-navbar">
+            <div class="container-fluid">     
+                <!-- Logo and homepage link, left corner -->
+                <a class="navbar-brand d-flex align-items-center" id="custom-logo" href="{{url_for('core.home')}}" title="{{app_name_full}}">
+                    <!-- Logo Image -->
+                    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="{{app_name}} icon" width="32" height="32" class="d-inline-block align-text-top">
+                    <!-- App Name, only on large screens -->
+                    <span class="ms-2 fw-bold fs-4 d-none d-lg-block me-2">{{app_name}}</span>
+                </a>
+
+                <!-- LESS THAN LG ONLY -->
+                <!--Selected System Name Denoter, only visible on login-->
+                <div class="navbar-text d-lg-none">
+                    <!-- Invisible Item to push proceeding content to the end-->
+                    {% if not current_user.is_anonymous %}
+                        {% if selected_system %}
+                            {% if selected_system.system_type.name == "production" %}
+                                <a href="{{url_for('core.systems')}}" class="btn btn-danger nav-item" role="button">{{selected_system.system_name}}</a>
+                            {% elif selected_system.system_type.name == "qa" %}
+                                <a href="{{url_for('core.systems')}}" class="btn btn-warning nav-item" role="button">{{selected_system.system_name}}</a>
+                            {% else %}
+                                <a href="{{url_for('core.systems')}}" class="btn btn-success nav-item" role="button">{{selected_system.system_name}}</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{url_for('core.systems')}}" class="btn btn-sm btn-secondary nav-item" role="button">No System Selected</a>
+                        {% endif %}               
+                    {% endif %}
+                </div>
+
+                <!-- Navbar Collapse toggle button -->
+                <button class="navbar-toggler custom-navbar-toggler m-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="bi bi-list custom-navbar-icon"></i>
+                </button>
+
+                <!-- Collapsible Section (collapses on less than lg screens) -->
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    
+                    <!-- LESS THAN LG ONLY -->
+                    <!-- Navbar right end items container-->
+                    <div class="d-flex d-lg-none p-1 border rounded justify-content-between">
+                        
+                        {% if not current_user.is_anonymous and current_user.user_role.name == 'admin' %}
+                            <!-- Admin Link -->
+                            <a class="btn nav-link ms-4" type="button" href="{{url_for('core.admin')}}" title="Administration">
+                                <i class="bi bi-shield-lock-fill custom-navbar-icon"></i>
+                            </a>
+                        {% endif %}
+
+                        <!-- Theme Toggler Button -->
+                        <button class="btn nav-link theme-toggle ms-4 me-4" type="button" title="Change Theme">
+                            <i id="theme-toggle-icon" class="bi bi-palette-fill custom-navbar-icon"></i>
+                        </button>
+
+                        <!--User Dropdown Menu-->
+                        <div class="nav-item dropdown me-4">
+                            
+                            <!-- Dropdown Icon -->
+                            <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="User Settings">
+                                <i class="bi bi-person-fill-gear custom-navbar-icon" title="User"></i>
+                            </a>
+                            
+                            <ul class="dropdown-menu dropdown-menu-end text-center custom-user-dropdown-menu border border-primary p-4 custom-user-dropdown-large">
+                                {% if not current_user.is_authenticated %}
+                                    <!-- Content when not logged IN -->
+                                    <h4>Not Logged In!</h4>
+                                    <hr>
+                                    
+                                    <!-- Quotes Card -->
+                                    <p class="text-center">{{selected_quote|safe}}</p>
+                                    <hr>
+
+                                    <div>
+                                        <a class="btn btn-primary mb-3 w-75" href="{{ url_for('auth.login')}}" role="button">Login</a>
+                                        {% if registration_allowed %}
+                                            <a class="btn btn-success mb-3 w-75" href="{{ url_for('auth.register')}}" role="button">Register</a>
+                                        {% endif %}
+                                        <a class="btn btn-dark w-75" href="{{project_link}}" target="_blank" role="button">Project Link</a>
+                                    </div>
+                                {% else %}
+                                    <!-- Content when logged in!-->
+                                    {% if current_user.user_role.name == 'admin' %}
+                                        <h3 class="badge bg-danger mb-2">ADMIN</h3>
+                                    {% endif %}
+
+                                    <h4 class="text-break">{{current_user.username.title()}} </h4>
+                                    <p class="text-break">{{current_user.email.lower()}}</p>
+                                    <hr>
+                                    
+                                    <!-- Quotes Card -->
+                                    <p class="text-center">{{selected_quote|safe}}</p>
+                                    <hr>
+
+                                    <div>
+                                        <a class="btn btn-primary mb-3 w-75" href="{{ url_for('core.systems')}}" role="button">Manage Systems</a>       
+                                        <a class="btn btn-danger mb-3 w-75" href="{{ url_for('auth.logout')}}" role="button">Logout</a>
+                                        <a class="btn btn-dark w-75" href="{{project_link}}" target="_blank" role="button">Project Link</a>
+                                    </div>
+                                    
+                                {% endif %}     
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Navbar Links-->
+                    <div class="navbar-nav navbar-nav-scroll me-auto">
+                        {% if not current_user.is_anonymous %}
+
+                            <!-- Execute Dropdown -->
+                            <div class="nav-item dropdown p-1">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-hand-index me-2"></i>APIs</a>
+                                <ul class="dropdown-menu">                                    
+                                    <li class="p-2"><a class="dropdown-item" href="{{url_for('api.rest_api')}}"><i class="bi bi-broadcast-pin me-2"></i>REST API</a></li>
+                                    <li class="p-2"><a class="dropdown-item" href="{{url_for('api.graphql')}}"><i class="bi bi-blockquote-right me-2"></i>GraphQL</a></li>
+                                    <li class="p-2"><a class="dropdown-item" href="{{url_for('api.console')}}"><i class="bi bi-terminal me-2"></i>Console</a></li>
+                                </ul>
+                            </div>
+                            
+                            
+                            <!-- Monitoring Dropdown -->
+                            <div class="nav-item dropdown p-1">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-activity me-2"></i>Monitoring</a>
+                                <ul class="dropdown-menu">
+                                    <li class="p-2"><a class="dropdown-item" href="{{url_for('api.sensors')}}"><i class="bi bi-router-fill me-2"></i>Sensors</a></li>
+                                    <li class="p-2"><a class="dropdown-item" href="{{url_for('api.healthcheck')}}"><i class="bi bi-heart-pulse me-2"></i>Healthchecks</a></li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Tools Dropdown -->
+                            <div class="nav-item dropdown p-1">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-tools me-2"></i>Tools</a>
+                                <ul class="dropdown-menu">
+                                    <li class="p-2"><a class="dropdown-item" href="{{url_for('core.tools')}}"><i class="bi bi-file-earmark-code-fill me-2"></i>Developer Tools</a></li>
+                                </ul>
+                            </div>
+
+                        {% endif %}
+                        <!-- Resources Dropdown -->
+                        <div class="nav-item dropdown p-1">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-bookshelf me-2"></i>Resources</a>
+                            <ul class="dropdown-menu">
+                                <li class="p-2"><a class="dropdown-item" href="{{url_for('core.tips')}}"><i class="bi bi-lightbulb me-2"></i>Tips</a></li>
+                                <li class="p-2"><a class="dropdown-item" href="{{url_for('docs.docs_homepage')}}"><i class="bi bi-journal-text me-2"></i>Documentation</a></li>
+                            </ul>
+                        </div>
+
+
+                        
+                        
+                    </div>
+
+
+                    <!-- LG AND ABOVE ONLY -->
+                    <!-- Navbar right end items container-->
+                    <div class="me-4 d-none d-lg-flex">
+
+                        <!-- Invisible Item to push proceeding content to the end-->
+                        <span class="invisible me-auto"></span>
+
+                        <!--Selected System Name Denoter, only visible on login-->
+                        <div class="navbar-nav me-4">
+                            {% if not current_user.is_anonymous %}
+                                {% if selected_system %}
+                                    {% if selected_system.system_type.name == "production" %}
+                                        <a href="{{url_for('core.systems')}}" class="btn btn-danger nav-item" role="button">{{selected_system.system_name}}</a>
+                                    {% elif selected_system.system_type.name == "qa" %}
+                                        <a href="{{url_for('core.systems')}}" class="btn btn-warning nav-item" role="button">{{selected_system.system_name}}</a>
+                                    {% else %}
+                                        <a href="{{url_for('core.systems')}}" class="btn btn-success nav-item" role="button">{{selected_system.system_name}}</a>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{{url_for('core.systems')}}" class="btn btn-secondary nav-item" role="button">No System Selected</a>
+                                {% endif %}                
+                            {% endif %}
+                        </div>
+
+                        {% if not current_user.is_anonymous and current_user.user_role.name == 'admin' %}
+                            <!-- Admin Link -->
+                            <a class="btn nav-link me-4" type="button" href="{{url_for('core.admin')}}" title="Administration">
+                                <i class="bi bi-shield-lock-fill custom-navbar-icon"></i>
+                            </a>
+                        {% endif %}
+                        
+                        <!-- Theme Toggler Button -->
+                        <button class="btn nav-link theme-toggle me-4" type="button" title="Change Theme">
+                            <i id="theme-toggle-icon" class="bi bi-palette-fill" style="font-size: 1.5em;"></i>
+                        </button>
+
+                        <!--User Dropdown Menu-->
+                        <div class="nav-item dropdown">
+                            
+                            <!-- Dropdown Icon -->
+                            <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="User Settings">
+                                <i class="bi bi-person-fill-gear custom-navbar-icon" title="User"></i>
+                            </a>
+                            
+                            <ul class="dropdown-menu dropdown-menu-end text-center custom-user-dropdown-menu border border-primary p-4 custom-user-dropdown-small">
+                                {% if not current_user.is_authenticated %}
+                                    <!-- Content when not logged IN -->
+                                    <h4>Not Logged In!</h4>
+                                    <hr>
+                                    
+                                    <!-- Quotes Card -->
+                                    <p class="text-center">{{selected_quote|safe}}</p>
+                                    <hr>
+
+                                    <div>
+                                        <a class="btn btn-primary mb-3 w-75" href="{{ url_for('auth.login')}}" role="button">Login</a>
+                                        <br>
+                                        {% if registration_allowed %}
+                                        <a class="btn btn-success mb-3 w-75" href="{{ url_for('auth.register')}}" role="button">Register</a>
+                                        <br>
+                                        {% endif %}                 
+                                        <a class="btn btn-dark w-75" href="{{project_link}}" target="_blank" role="button">Project Link</a>
+                                    </div>
+                                {% else %}
+                                    <!-- Content when logged in!-->
+                                    {% if current_user.user_role.name == 'admin' %}
+                                        <h3 class="badge bg-danger mb-2">ADMIN</h3>
+                                    {% endif %}
+                                    <h4 class="text-break">{{current_user.username.title()}}
+                                    </h4>
+                                    <p class="text-wrap text-break">{{current_user.email.lower()}}</p>
+                                    <hr>
+                                    
+                                    <!-- Quotes Card -->
+                                    <p class="text-center">{{selected_quote|safe}}</p>
+                                    <hr>
+
+                                    <div>
+                                        <a class="btn btn-primary mb-3 w-75" href="{{ url_for('core.systems')}}" role="button">Manage Systems</a>
+                                        <br>
+                                        <a class="btn btn-danger mb-3 w-75" href="{{ url_for('auth.logout')}}" role="button">Logout</a>
+                                        <br>
+                                        <a class="btn btn-dark w-75" href="{{project_link}}" target="_blank" role="button">Project Link</a>
+                                    </div>
+                                    
+                                {% endif %}
+                                
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>    
+            </div>
+        </nav>
+
+        <!-- The below code will display flash messages from flask-->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}    
+                {% for category, message in messages %}
+                    <div class="alert alert-{{category if category != 'message' else 'primary'}} alert-dismissible fade show m-2" role="alert">
+                        {{message}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+
+        <!-- This is for showing flash messages in ajax methods -->
+        <div class="alert alert-dismissible fade show m-2" id="my-custom-alert" style="display: none;" role="alert">
+            <div id="my-custom-alert-text">Text</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- The below line will be replaced by content from whichever page is being loaded -->
+        {% block content %}{% endblock %}
+        
+        <!--Script to show loading disc when api button clicked-->
+        <script>
+            function showLoadingIcon(targetElementID) {
+                var element = document.getElementById(targetElementID);
+                if (element) {
+                    element.innerHTML = `
+                        <div class="d-flex justify-content-center align-items-center h-100 w-100 loading-icon-wrapper">
+                            <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>`;
+                }
+            }
+        </script>
+        
+        
+        <!--Script to copy output to clipboard-->
+        <script>
+            async function copyContentsOf(elementID) {
+                var codeElement = document.getElementById(elementID);
+                
+                if (codeElement) {
+                    var textToCopy = codeElement.innerText.trim();
+                    
+                    if (textToCopy) {
+                        try {
+                            // Use the Clipboard API to write the text (does not work in non-https environments)
+                            await navigator.clipboard.writeText(textToCopy);
+
+                            codeElement.classList.add('glow-active');
+                            setTimeout(() => {
+                                codeElement.classList.remove('glow-active');
+                            }, 1000);
+
+                            // Show Popover on successful copy
+                            const buttonElement = document.getElementById('custom-copy-text-button');
+                            const popoverInstance = bootstrap.Popover.getOrCreateInstance(buttonElement);
+                            
+                            popoverInstance.show();
+                            setTimeout(() => {
+                                popoverInstance.hide();
+                            }, 1000);
+                        } 
+                        catch (err) {
+                            console.error('Failed to copy: ', err);
+                            alert("Failed to copy to clipboard. Please copy manually.");
+                        }
+                    }
+                }
+            }
+        </script>
+
+
+        <!-- Script to help with toggling visibility of API input panels -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+        
+                // Function to toggle sidebar visibility
+                window.toggleConsoleSidebar = function() {
+                    const sidebar = document.getElementById('api-input-toggle');
+                    const icon = document.getElementById('sidebarToggleIcon');
+                    const btn = document.getElementById('sidebarToggleBtn');
+                    const outputElement1 = document.getElementById('output-element-container-1');
+                    const outputElement2 = document.getElementById('output-element-container-2');
+                    if (sidebar) {
+                        sidebar.classList.toggle('collapsed');
+                        
+                        // Update Icon and Button appearance
+                        if (sidebar.classList.contains('collapsed')) {
+                            if(icon) {
+                                icon.classList.remove('bi-layout-sidebar-inset');
+                                icon.classList.add('bi-layout-sidebar');
+                            }
+                            if(btn) {
+                                btn.classList.remove('btn-outline-primary');
+                                btn.classList.add('btn-primary');
+                            }
+                            if(outputElement1){
+                                outputElement1.classList.remove('col-lg-9');
+                            }
+                            if(outputElement2){
+                                outputElement2.classList.remove('col-lg-6');
+                            }
+                        }
+                        else {
+                            if(icon) {
+                                icon.classList.remove('bi-layout-sidebar');
+                                icon.classList.add('bi-layout-sidebar-inset');
+                            }
+                            if(btn) {
+                                btn.classList.remove('btn-primary');
+                                btn.classList.add('btn-outline-primary');
+                            }
+                            if(outputElement1){
+                                outputElement1.classList.add('col-lg-9');
+                            }
+                            if(outputElement2){
+                                outputElement2.classList.add('col-lg-6');
+                            }
+                        }
+                    }
+                };
+            });
+        </script>
+
+
+
+        <!-- Bootstrap Min JS Script -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+        <!-- JQuery Script -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+        <!-- The below code is for making the theme toggler button work. It needs to be added after the button, but at the top of the page if possible, hence it's in this position -->
+        <script>
+            (() => {
+                'use strict'
+
+                const getStoredTheme = () => localStorage.getItem('theme')
+                const setStoredTheme = theme => localStorage.setItem('theme', theme)
+
+                const getPreferredTheme = () => {
+                    const storedTheme = getStoredTheme()
+                    if (storedTheme) {
+                        return storedTheme
+                    }
+                    // Fallback to user's system preference
+                    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+                }
+
+                const setTheme = theme => {
+                    document.documentElement.setAttribute('data-bs-theme', theme)
+                }
+
+                setTheme(getPreferredTheme())
+
+                window.addEventListener('DOMContentLoaded', () => {
+                    const themeTogglers = document.querySelectorAll(".theme-toggle");
+                    themeTogglers.forEach(themeToggler => {
+                        themeToggler.addEventListener('click', () => {
+                            const currentTheme = getStoredTheme() || getPreferredTheme();
+                            const themeArray = ['light', 'dark'];
+                            const currentIndex = themeArray.indexOf(currentTheme);
+                            const newTheme = themeArray[(currentIndex + 1) % themeArray.length];
+                            setStoredTheme(newTheme);
+                            setTheme(newTheme);
+                        })
+                    });
+                })
+            })()
+        </script>
+
+        <!-- Imports moment.js library used to display times -->
+        {{ moment.include_moment() }}
+        
+    </body>
+</html>

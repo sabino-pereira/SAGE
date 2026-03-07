@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+{% import "macros.html" as macroTemplate %}
+
+{% block content %}
+<div class="container-fluid p-4">
+
+    <!-- Greeting Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="text-muted">
+                नमस्ते {{current_user.username.title()}}, <span id="custom-greeting" class="fw-semibold"></span>!
+            </h3>
+        </div>
+    </div>
+
+    <!-- System Details Section -->
+    {% if selected_system %}
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-body p-1">
+            <!-- Header Row: System Name & Controls -->
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-center mb-4 border-bottom pb-3">
+                
+                <!-- System Identity -->
+                <div class="mb-3 mb-lg-0 text-center text-lg-start">
+                    <h4 class="mb-sm-2 d-inline-block align-middle">
+                        <a href="{{selected_system.system_url}}" target="_blank" class="text-decoration-none fw-bold" style="color:#FF7F50;" title="System URL">
+                            {{ selected_system.system_name }}
+                        </a>
+                    </h4>
+                    <div class="d-inline-block ms-2 align-middle">
+                        {% if selected_system.system_type.name == "production" %}
+                            <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger">{{ selected_system.system_type.value.upper() }}</span>
+                        {% elif selected_system.system_type.name == "qa" %}
+                            <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning">{{ selected_system.system_type.value.upper() }}</span>
+                        {% else %}
+                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success">{{ selected_system.system_type.value.upper() }}</span>
+                        {% endif %}
+                        <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary ms-1">{{ selected_system.deployment_type.value.title() }}</span>
+                    </div>
+                </div>
+
+                <!-- Fetch Controls -->
+                <div class="text-muted small d-flex align-items-center">
+                    <span class="me-3 placeholder-glow">
+                        <i class="bi bi-clock me-1"></i> Updated <span id="system-details-timestamp" class="replace-placeholder fw-semibold">...</span>
+                    </span>
+                    <button type="button" id="btn-fetch-details" class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="fetch_details('Yes')">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Data Grid -->
+            <div class="row g-4">
+                <!-- System Info -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="p-3 h-100 border rounded-3">
+                        <h6 class="text-uppercase text-muted fw-bold mb-3 small"><i class="bi bi-info-circle me-2"></i>System Info</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Internal Name</span>
+                                <span class="fw-semibold replace-placeholder text-break text-end" id="System_name">-</span>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">STEP Version</span>
+                                <span class="fw-semibold replace-placeholder text-break" id="STEP_version">-</span>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">In-Memory</span>
+                                <span class="fw-semibold replace-placeholder" id="Is_InMemory_Enabled">-</span>
+                            </li>
+                            <li class="d-flex justify-content-between">
+                                <span class="text-muted">Allowed Users</span>
+                                <span class="fw-semibold replace-placeholder" id="Allowed_number_of_user_accounts">-</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Configuration -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="p-3 h-100 border rounded-3">
+                        <h6 class="text-uppercase text-muted fw-bold mb-3 small"><i class="bi bi-sliders me-2"></i>Configuration</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Contexts</span>
+                                <span class="fw-semibold replace-placeholder" id="Number_of_contexts">-</span>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Dimensions</span>
+                                <span class="fw-semibold replace-placeholder" id="Number_of_dimensions">-</span>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Languages</span>
+                                <span class="fw-semibold replace-placeholder" id="Number_of_languages">-</span>
+                            </li>
+                            <li class="d-flex justify-content-between">
+                                <span class="text-muted">Users</span>
+                                <span class="fw-semibold replace-placeholder" id="Number_of_user_accounts_(including_suppliers)">-</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Data Stats -->
+                <div class="col-lg-4 col-12">
+                    <div class="p-3 h-100 border rounded-3">
+                        <h6 class="text-uppercase text-muted fw-bold mb-3 small"><i class="bi bi-database me-2"></i>Data Statistics (Approximate)</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Products</span>
+                                <span class="fw-semibold replace-placeholder" id="Number_of_products_(approx.)">-</span>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Classifications</span>
+                                <span class="fw-semibold replace-placeholder" id="Number_of_classifications_(approx.)">-</span>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Assets</span>
+                                <span class="fw-semibold replace-placeholder" id="Number_of_assets_(approx.)">-</span>
+                            </li>
+                            <li class="d-flex justify-content-between">
+                                <span class="text-muted">Entities</span>
+                                <span class="fw-semibold replace-placeholder" id="Number_of_entities_(approx.)">-</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+        <!-- No System State -->
+        <div class="text-center py-5 mb-4 rounded-3 border border-dashed">
+            <i class="bi bi-hdd-network text-muted display-4 mb-3"></i>
+            <h5 class="fw-normal text-muted">No System Selected</h5>
+            <p class="text-muted mb-3">Select a system to view its dashboard.</p>
+            <a href="{{ url_for('core.systems') }}" class="btn btn-primary px-4 rounded-pill">Manage Systems</a>
+        </div>
+    {% endif %}
+    
+
+    <hr class="mt-5 mb-4 opacity-25">
+
+    <!-- Quick Access Links (Collapsible) -->
+    <div class="mb-5">
+        <div class="d-flex align-items-center justify-content-start mb-2">
+            <button class="btn btn-link text-decoration-none text-secondary p-0 d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#quickAccessSection" aria-expanded="false" aria-controls="quickAccessSection">
+                <i class="bi bi-chevron-right me-2 small" id="quickAccessToggleIcon"></i>
+                <span class="fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Quick Access Links (Click to Open)</span>
+            </button>
+            
+            <button type="button" class="btn btn-sm btn-secondary rounded-pill border-0 ms-2" data-bs-toggle="modal" data-bs-target="#addQuickAccessLinkFormModal" title="Add New Link">
+                <i class="bi bi-plus-lg small"></i>
+            </button>
+        </div>
+
+        <div class="collapse" id="quickAccessSection">
+            <div class="card card-body border-0 rounded-3 p-3">
+                <div class="row g-2">
+                    {% if all_links|length > 0 %}
+                        {% for link in all_links %}
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-12">
+                                <div class="card h-100 border">
+                                    <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                                        <div class="text-truncate me-2 w-100">
+                                            <a href="{{link.link_url}}" target="_blank" class="text-decoration-none stretched-link">
+                                                <div class="fw-semibold text-truncate small" title="{{link.link_name}}">{{link.link_name}}</div>
+                                            </a>
+                                        </div>
+                                        <form action="{{ url_for('core.delete_link', link_id=link.id) }}" method="post" onsubmit="return confirm('Delete link \'{{link.link_name}}\'?');" class="z-2 position-relative d-flex">
+                                            {{ delete_form.hidden_tag() }}
+                                            <button type="submit" class="btn btn-link text-secondary p-0 opacity-50" title="Delete Link">
+                                                <i class="bi bi-x-lg" style="font-size: 0.7rem;"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12 text-center text-muted small py-2">
+                            No links added yet. Click 'Add' to create one.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Quick Access Link Modal -->
+    <form action="" method="post" class="text-center" novalidate>
+        <div class="modal fade" id="addQuickAccessLinkFormModal" tabindex="-1" aria-labelledby="addQuickAccessLinkFormModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 90vw">
+                <div class="modal-content border-info shadow">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="addQuickAccessLinksLabel">Add Link</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">            
+                        {{ form.hidden_tag() }}
+                        {{ macroTemplate.form_field(form.link_name) }}
+                        <br>
+                        {{ macroTemplate.form_field(form.link_url) }} 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        {{ form.submit(class="btn btn-success") }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+
+<!-- Script to get user's local time and generate a greeting based on it-->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentHour = moment().hour();
+        let greeting = "Good day";
+
+        if (currentHour >= 5 && currentHour < 12) greeting = "Good Morning";
+        else if (currentHour >= 12 && currentHour < 17) greeting = "Good Afternoon";
+        else if (currentHour >= 17 && currentHour < 21) greeting = "Good Evening";
+        else if (currentHour >= 21 || currentHour < 5) greeting = "Good Night";
+
+        document.getElementById('custom-greeting').textContent = greeting;
+    });
+</script>
+
+
+<!-- Script to fetch data and pass it to parse function -->
+<script>
+    
+    // This block is what sets system-details values on PAGE LOAD by fetching from the database
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch_details()
+    });
+
+    
+    // This is the function that fetches values. Either from DB or by making a new rest api call depending on parameter 'refresh_data_bool'
+    async function fetch_details(refresh_data_bool="NO") {
+        const fetchButton = document.getElementById('btn-fetch-details');
+        
+        //Default path that fetches from DB
+        let path = '/fetch-system-details';
+        
+        // Fetch details newly from the system
+        if(refresh_data_bool == "Yes") {
+            path = '/refresh-system-details';
+            if(fetchButton) {
+                fetchButton.disabled = true;
+                fetchButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            }
+        }
+        // Makes cards glow and have the 'placeholder' effect on button click
+        const elements = document.querySelectorAll('.replace-placeholder');
+        elements.forEach(el => {
+            el.classList.add('placeholder');
+            if (el.id === 'system-details-timestamp') {
+                el.classList.remove('text-muted');
+            }
+        });
+        
+
+        try {
+            // Fetch data from respective path
+            const response = await fetch(path, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': "{{ delete_form.csrf_token.current_token }}"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // save response in attribute in json format
+            const response_value = await response.json();
+            
+            // Send data to parse value function
+            parse_and_set_data(response_value.date, response_value.content, refresh_data_bool);
+        } catch (error) {
+            console.error("Error fetching system details:", error);
+            parse_and_set_data(null, null, refresh_data_bool);
+        } finally {
+            if(refresh_data_bool == "Yes" && fetchButton) {
+                fetchButton.disabled = false;
+                fetchButton.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh';
+            }
+        }
+    }  
+
+
+    // This function will take the data and set it in the page
+    function parse_and_set_data(time, content, is_function_refresh) {
+        //Remove placeholder from all elements
+        const elements = document.querySelectorAll('.placeholder');
+        elements.forEach(el => {
+            el.classList.remove('placeholder');
+        });
+
+
+        let targetTimeElement = document.getElementById('system-details-timestamp');
+
+        if (time && content) {     
+            targetTimeElement.innerHTML = moment(time).fromNow();
+            
+            Object.keys(content).forEach(key => { 
+                let value = content[key];
+                const data_element = document.getElementById(key);
+                if(data_element){
+                    if(key == "Is_InMemory_Enabled"){
+                        if (value == "true"){
+                            value = "Enabled"
+                        }
+                        else{
+                            value = "Disabled"
+                        }
+                    }
+                    data_element.innerHTML = value;
+                }
+            });
+        }
+        else {
+            if(is_function_refresh  == "Yes"){
+                targetTimeElement.innerHTML = "Unable to fetch system details. Recheck the URL & Credentials. Alternatively make sure the application is able to reach the STEP system (IP whitelisting).";
+                targetTimeElement.classList.add('text-danger');
+            }
+        }
+    }
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // This script auto-opens add-system modal when an error is detected in the form
+        var formErrorElements = document.getElementsByClassName("is-invalid");
+        if(formErrorElements && formErrorElements.length > 0){            
+            var myModalElement = document.getElementById("addQuickAccessLinkFormModal");
+            var modalTitleElement = document.getElementById("addQuickAccessLinksLabel");
+            
+            const myModal = new bootstrap.Modal(myModalElement);
+            myModal.show();
+            modalTitleElement.insertAdjacentHTML('beforeend', "<span class='text-danger'> - Error Occured </span>");
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const quickAccessCollapse = document.getElementById('quickAccessSection');
+        const quickAccessIcon = document.getElementById('quickAccessToggleIcon');
+        
+        if(quickAccessCollapse && quickAccessIcon){
+            quickAccessCollapse.addEventListener('show.bs.collapse', () => {
+                quickAccessIcon.classList.replace('bi-chevron-right', 'bi-chevron-down');
+            });
+            quickAccessCollapse.addEventListener('hide.bs.collapse', () => {
+                quickAccessIcon.classList.replace('bi-chevron-down', 'bi-chevron-right');
+            });
+        }
+    });
+</script>
+
+{% endblock %}

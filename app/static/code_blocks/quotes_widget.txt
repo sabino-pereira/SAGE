@@ -1,0 +1,30 @@
+<div style='display: flex; flex-direction: column; justify-content: space-between; text-align:center; width: 95%;'> 
+<button id='button' style='margin: 0;' class='stibo-GraphicsButton material' onclick="javascript:{ 
+    const myList = ['Opportunity is missed by most people because it`s dressed in overalls and looks like work.', 
+    'I love deadlines. I like the whooshing sound they make as they fly by.',  
+    'Doing nothing is very hard to do...you never know when you are finished.',  
+    'I don`t have a solution, but I do admire the problem.',  
+    'I`m not saying I am Batman, but have you ever seen me and Batman in the same room?',  
+    'A clear conscience is a sure sign of a bad memory.',  
+    'In the beginning the Universe was created. This has made a lot of people very angry and has been widely regarded as a bad move.', 
+    'Hold on, dowloading more RAM....',  
+    'Never let your sense of morals prevent you from doing what is right.',  
+    'How many people here have telekenetic powers? Raise my hand.',  
+    'I was going to tell you guys a time travel joke, but you didn`t like it.', 
+    'This is my STEP system, I never knew my real system.', 
+    'The inventor of the knock knock joke should get a Nobel prize.', 
+    'I have an inferiority complex, but it`s not a very good one.', 
+    'Make LOV, not War.', 
+    'Real stupidity beats artificial intelligence every time.', 
+    'Only floss the teeth you want to keep.', 
+    'It is a capital mistake to theorize before one has the data.', 
+    'There is nothing more permanent than a temporary solution.', 
+    'A man walks into a zoo, the only animal in the entire zoo is a dog. It`s a shitzu.', 
+    'Rick Astley will let you borrow any movie from his Pixar collection, except one. He`s never gonna give you UP.', 
+    'I`m not superstitious, but I am a little stitious.', 
+    'One WebUI to rule them all, One WebUI to find them, One WebUI to combine them all and in the database bind them.']; function getRandomQuote() { return (Math.floor(Math.random() * myList.length));} document.getElementById('para').innerHTML= '<p>' + myList[getRandomQuote()]; + '</p>'  }"> 
+<p> Refresh </p> </button> <br>  <p style='border: 1px solid black; border-radius: 5px; height: 200%; font-family: "Times New Roman", Times, serif;, monospace; text-shadow: 1px #044b5b; font-size: 1.5em; color: white; background-color: #4CAF50;' id='para'></p> <br>  <button style='margin: 0;' class='stibo-GraphicsButton material' onclick="javascript:{ document.getElementById('_Quotes').replaceWith(''); }"> 
+<p> Hide </p> 
+</button> 
+<img src onerror="javascript:{ try{document.getElementById('button').click();}  catch(err){}}"> 
+</div>

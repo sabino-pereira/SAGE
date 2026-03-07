@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container-fluid d-flex flex-column justify-content-center align-items-center text-center" style="height: 80vh;">
+        <!-- Error Icon -->
+        <div class="mb-4">
+            <i class="bi bi-bug-fill text-danger" style="font-size: 6rem;"></i>
+        </div>
+
+        <!-- Error Text -->
+        <h1 class="display-1 fw-bold">500</h1>
+        <h2 class="mb-2">Internal Server Error</h2>
+        <p class="mb-5">An unexpected error occurred. Please contact the administrator for help.</p>
+
+        <div class="d-flex gap-3 flex-wrap justify-content-center">
+            <a href="{{ url_for('core.home') }}" class="btn btn-primary btn-lg">Go to Homepage</a>
+            <a href="{{ email_link }}" class="btn btn-warning btn-lg">Email Admin</a>
+        </div>
+    </div>
+    
+{% endblock %}

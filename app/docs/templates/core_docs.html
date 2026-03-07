@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+
+        <!-- Main Page Header -->
+        <div class="text-center mt-2 p-2">
+            <h1>Core Features</h1>
+            <p class="fs-5 text-muted">A deeper dive into some of the application basics.</p>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="container card border">
+            <div class="fw-bold card-header fs-4">
+                Table of Contents
+            </div>
+            <ol class="text-start mt-2">
+                <li><a href="#navigation" class="text-decoration-none">Navigation</a></li>
+                <li><a href="#systems" class="text-decoration-none">Systems</a></li>
+                <li><a href="#user" class="text-decoration-none">User</a></li>
+                <li><a href="#privacy" class="text-decoration-none">Privacy</a></li>
+            </ol>
+        </div>
+
+        <br>
+
+        <section id="navigation" class="mt-2">
+            <h2><a class="text-decoration-none" href="#navigation">Navigation</a></h2>
+            <p class="fs-4">SAGE follows a simple navigation system. There is a sticky navigation bar the at top that is always visible. You can use this to get to almost all areas within SAGE:</p>
+            <img src="{{ url_for('static', filename='img/ss-navbar.png') }}" alt="Navbar" class="img-fluid img-thumbnail m-2 border-info">
+            <ul class="mt-3">
+                <li>The SAGE logo and image on the far left is a link to the homepage.</li>
+                <li>Next we have dropdowns and links to various pages. These link to the main features within SAGE like API integrations, monitoring tools, developer tools, and various resources.</li>
+                <li>Next you will see a colored button with the name of the selected system. This is a quick way to check the currently selected system from the 'Systems' page. This box is color coded based on the type of environment selected for <span class="text-success">Development</span>, <span class="text-warning">QA/UAT</span>, and <span class="text-danger">Production</span>. Clicking on this button takes you to the 'Systems' page if you want to add/edit systems.</li>
+                <li>The next item is a shield icon that takes you to the 'Admin' page. This is only visible to SAGE Admin users.</li>
+                <li>Following this is a color palette icon that you can use to toggle the theme of the application between light and dark modes.</li>
+                <li>Finally there is a user icon which opens the user details panel. There are multiple options here including a logout button.</li>
+            </ul>
+            <div class="alert alert-info">
+                Note that if you are using a smaller screen, the navbar will appear collapsed with limited options along with a button to expand it to show the remaining items:
+                <img src="{{ url_for('static', filename='img/ss-navbar-collapsed.png') }}" alt="Collapsed Navbar" class="img-fluid img-thumbnail m-2 border-info">
+            </div>
+        </section>
+        
+        <br>
+        <hr>
+        
+        <section id="systems" class="mt-2">
+            <h2><a class="text-decoration-none" href="#systems">Systems</a></h2>
+            <p class="fs-4">"Systems" are the core functional input needed for SAGE to work. A system is simply a representation of a single STEP environment that you add to SAGE, telling the application where to connect.</p>
+            <p>If you work with STEP, you likely manage multiple environments like sandboxes, development, testing, and production instances. Each of these is a 'System' in SAGE.</p>
+            <p>You can navigate to the <a href="{{ url_for('core.systems') }}">Systems Page</a> and add each system you work with using the 'Add System' button.</p>
+            <p>In the form that opens up, fill in the details. Every field shown is mandatory:</p>
+            <img src="{{ url_for('static', filename='img/ss-add-system.png') }}" alt="Add System Form" class="img-fluid img-thumbnail m-2 border-info">
+            <ul>
+                <li>The System Name can be anything you choose.</li>
+                <li>The System URL needs to be a valid url starting with 'https://'</li>
+                <li>Select the environment type (Development, QA, or Production)</li>
+                <li>Select the deployment type (SaaS or On-Prem)</li>
+                <li>Fill in the User ID, Password, Context, and Workspace to be used as defaults when working with APIs. These can be overridden at runtime if needed.</li>
+            </ul>
+            <p>You can add multiple systems and switch between them by selecting any one from the Systems Page using the 'toggle' button at the top right of the card. The selected system will be highlighted with a colored background.</p>
+            <p>You can also edit an existing added system by clicking the edit button or delete it, as needed.</p>
+            <img src="{{ url_for('static', filename='img/ss-system-selection.png') }}" alt="Multiple Systems" class="img-fluid img-thumbnail m-2 border-info">
+            
+        </section>
+        
+        <br>
+        <hr>
+
+        <section id="user" class="mt-2">
+            <h2><a class="text-decoration-none" href="#user">User</a></h2>
+            <p class="fs-4">Access to SAGE's features is locked behind a user account. This allows multiple people to use the application and have their own set of stored data (like configured systems).</p>
+            <p>To create a user account, click on the 'Register' button. It's visible in the homepage or in the User Details panel. Fill in the form to have an account created. </p>
+            <p>Once registered, you can log in with your credentials and proceed to add and manage your Systems.</p>
+            <p>There is a special 'Admin' role that is automatically granted to the first user who registers on the system. This role comes with additional options, allowing the admin to monitor SAGE usage and manage application settings.</p>
+            
+        </section>
+        
+        <br>
+        <hr>
+
+        <section id="privacy" class="mt-2">
+            <h2><a class="text-decoration-none" href="#privacy">Privacy</a></h2>
+            <p class="fs-4">SAGE is designed as a helper application. No analytics or data from your STEP system are collected, with the exception of a few functional data points. And NONE of those are shared with any third party.</p>
+            <p>These data points are:</p>
+            <ol>
+                <li>The time when a user was last active for Admin auditing</li>
+                <li>The number of visits to a particular page per user. This helps to gauge which features are used most, guiding future development.</li>
+                <li>The system details fetched on the homepage, along with the data you input when adding a system, are saved in the database. <strong>This is solely to provide convenience to the user; this data is not being used in any other way.</strong></li>
+            </ol>
+        </section>
+        
+        <br>
+        <hr>
+        
+        <br>
+    </div>
+{% endblock %}

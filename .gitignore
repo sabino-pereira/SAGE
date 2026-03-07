@@ -1,0 +1,8 @@
+./venv
+venv/
+__pycache__/
+flask_session/
+db/
+app.db
+migrations/
+.env
