@@ -14,4 +14,4 @@ fi
 flask db migrate --directory ./db/migrations -m "auto-migration"
 flask db upgrade --directory ./db/migrations
 
-exec gunicorn -b :3110 --access-logfile - --error-logfile - sage:flaskApp
+exec gunicorn -b :3110 --timeout 300 --access-logfile - --error-logfile - sage:flaskApp
