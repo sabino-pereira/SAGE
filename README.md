@@ -1,39 +1,55 @@
 # SAGE - STEP API Gateway Engine
 
-## The Swiss Army Knife for Stibo STEP Developers.
 
-**SAGE** might be your new best friend if you work with the <a href="https://www.stibosystems.com/platform" target="_blank">Stibo STEP MDM platform</a>.
+## About the Project
 
-It streamlines your development workflow by bringing multiple environments, APIs, and monitoring tools in one place. You can work with, monitor, and apply changes on your STEP system from one unified dashboard.
+**SAGE** might be your new best friend if you work with the [Stibo STEP MDM platform](https://www.stibosystems.com/platform). Built to scratch a personal itch within the Stibo STEP ecosystem, this tool has evolved from a hobby project into a robust daily driver for developers. Feedback is highly encouraged! Open an issue or a discussion if you have ideas for improvements.
 
-> This started as a hobby project to scratch my own itch to build something to complement STEP. It quickly evolved into a robust tool that I feel most developers can use daily. I built this to make *our* lives easier. Feedback is super welcome!
-
-<br>
-
-> **AI Disclosure:** This app is AI-assisted, not AI made. This means that I used AI during development to assist in some parts, but every line of code is reviewed and tested by me.
+> SAGE has a responsive UI, so it scales accordingly on mobile devices as well.
 
 
-## Main Features
+1. #### Privacy & Hosting
 
-*   **System Management**: Configure and switch between multiple STEP systems.
-*   **API Integartions**:
+- 100% Self-Hosted. You have total control, there is no tracking, telemetry, or "phoning home".
+
+- Data Ownership: As a self-hosted app, the first registered user (Admin) has full visibility into the local database and usage statistics.
+
+2. #### AI Disclosure
+
+- This app is AI-assisted, but not AI made. This means that I took help from AI (Gemini specifically) during development for getting to some answers quicker, but every line of code is reviewed and tested by me. 
+
+3. #### License
+
+- Licensed under GPLv3. Use it, modify it, and share it—just remember that any distributed derivative works must also be open-sourced under the same terms.
+
+
+## Features
+
+1.   **System Management**: Configure and switch between multiple STEP systems.
+2.   **API Integartions**:
     *   **REST API**: Ability to run all STEP RESTAPI V2 commands
     *   **GraphQL**: Execute any GraphQL query
     *   **Console Mode**: Custom built click-and-go **quality of life features** combining the best of both APIs.
-*   **Monitoring**:
+3.   **Monitoring**:
     *   **Healthchecks**: View results of STEP's pre configured tests.
     *   **Sensors**: Real-time system monitoring via sensors.
-*   **Developer Toolkit**: Utilities for your day-to-day tasks.
-*   **Pro Tips**: Best practices, how-to's, and tips & tricks based on real-world experience.
+4.   **Developer Toolkit**: Utilities for your day-to-day tasks.
+5.   **Pro Tips**: Best practices, how-to's, and tips & tricks based on experience.
 
-> Note that the above features are tested and confired working on the newer version of SaaS STEP (2024.X+). Most of them will also run on older versions, but there's no guarantee of it.
+<br>
 
->  **Special thanks to Stibo Systems for providing the sandbox environments for testing.**
+```
+Demo Instance:
+- URL - https://sage.sabino.in
+- Username - demo
+- Password - demodemo
+```
 
+<br>
 
 ## Screenshots
 <details>
-<summary>Click to open</summary>
+<summary>Click to expand</summary>
 
 **Homepage**
 ![Homepage](app/static/img/ss-homepage.png)
@@ -51,7 +67,7 @@ It streamlines your development workflow by bringing multiple environments, APIs
 ![Console](app/static/img/ss-console-2.png)
 
 **Sensors**
-![Sensors](app/static/img/ss-sensors-loaded.png)
+![Sensors](app/static/img/ss-sensors-filter.png)
 
 **Healthchecks**
 ![Healthchecks](app/static/img/ss-healthcheck-fetched.png)
@@ -59,6 +75,9 @@ It streamlines your development workflow by bringing multiple environments, APIs
 **Tools**
 ![Tools](app/static/img/ss-tools-example.png)
 </details>
+
+<br>
+<br>
 
 ## Installation
 
@@ -70,11 +89,11 @@ It streamlines your development workflow by bringing multiple environments, APIs
    ```
    git clone https://github.com/sabino-pereira/SAGE.git
    ```
-2. **Open your terminal** in the project folder.
+2. **Switch to the project folder.**
    ```
    cd SAGE
    ```
-3. **Create a python virtual environment:**
+3. **Open a terminal and create a python virtual environment:**
    ```
    python3 -m venv venv
    ```
@@ -85,7 +104,7 @@ It streamlines your development workflow by bringing multiple environments, APIs
    ```
    pip install -r requirements.txt
    ```
-6. **Set up security:**
+6. **Set up a secret key:**
   Create a `.env` file in the root directory and set:
    ```
    SECRET_KEY=your-super-secret-key
@@ -94,7 +113,7 @@ It streamlines your development workflow by bringing multiple environments, APIs
 
 7. **Initialize the Database:**
    ```
-   mkdir db
+   mkdir db                                                    -> Linux only
    flask db init --directory db/migrations
    flask db migrate --directory db/migrations -m "Initiating"
    flask db upgrade --directory db/migrations
@@ -103,23 +122,25 @@ It streamlines your development workflow by bringing multiple environments, APIs
    ```
    flask run
    ```
-9. Access the application at `http://localhost:3110` (or <server-ip:3110>).
+9. Access the application at `http://localhost:3110` (or <your-server-ip:3110>).
 
 
 <br>
 
 <strong>2. Docker </strong>
-   1. Make sure you have docker installed on your machine
-   2. Create a new directory to store everything
+   1. **Make sure you have docker installed on your machine**
+   2. **Create new directories to store everything**
       ```
       mkdir -p sage/db
       cd sage
       ```
-   3. Run the docker command:
+   3. **Run the docker image**:
       ```
       docker run -d --name sage -p 3110:3110 -e SECRET_KEY=<secret-key> -v ./db:/sage/db ghcr.io/sabino-pereira/sage:latest
       ```
-   4. If you prefer to use docker-compose:
+
+      The secret key needs to be generated, it can be anything by make it complex for better security.
+   4. **If you prefer to use docker-compose**:
       ```
       services:
         sage:
@@ -139,12 +160,16 @@ It streamlines your development workflow by bringing multiple environments, APIs
 <br>
 
 
-Once you're up and running, check the built-in docs for a tour.
+Once you're up and running, check the built-in docs for a tour and explanation of the basic of the app.
 
 ---
 
 ## Tech Stack
 
-*   **Python**
-*   **Flask** (plus extensions)
-*   **Bootstrap 5**
+1.   **Python**     -> Main Language
+2.  **Flask**       -> Web Framewrok
+3. **Bootstrap 5**  -> For Web Design
+
+<br>
+
+>Special thanks to [this incredible blog](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world) by **Miguel Grinberg** that taught me how to use flask.

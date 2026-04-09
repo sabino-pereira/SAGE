@@ -25,7 +25,7 @@ moment = Moment()
 #Inititate Flask Session object
 flask_session = Session()
 
-# Dictionary for tracking page visits
+# Dictionary for module usage
 # Defined globally to avoid recreation on every request
 TRACK_PAGES_DICTIONARY = {
     "core.home": "Home",

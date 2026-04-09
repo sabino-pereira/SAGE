@@ -95,6 +95,7 @@ class Config:
     """
     User Overidable Config
     """
+    
     #This option allows to enable or disable the registration process.
     REGISTRATION_ALLOWED = True
     
