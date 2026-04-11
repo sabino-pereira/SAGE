@@ -74,7 +74,7 @@
 ![GraphQL](app/static/img/ss-graphql.png)
 
 **Console Interface**
-![Console](app/static/img/ss-console-2.png)
+![Console](app/static/img/ss-console.png)
 
 **Sensors**
 ![Sensors](app/static/img/ss-sensors-filter.png)
