@@ -3,47 +3,56 @@
 
 ## About the Project
 
-**SAGE** might be your new best friend if you work with the [Stibo STEP MDM platform](https://www.stibosystems.com/platform). Built to scratch a personal itch within the Stibo STEP ecosystem, this tool has evolved from a hobby project into a robust daily driver for developers. Feedback is highly encouraged! Open an issue or a discussion if you have ideas for improvements.
+**SAGE** might be your new best friend if you work with the [Stibo STEP MDM platform](https://www.stibosystems.com/platform). Built to scratch a personal itch within to create something within the Stibo STEP ecosystem, this tool has evolved from a hobby project into a robust tool that can help developers in their daily work. Think of it as a centralized dashboard to manage and monitor multiple Stibo STEP instances. Feedback is always welcome, please open an issue or discussion if you have ideas for improvements.
 
-> SAGE has a responsive UI, so it scales accordingly on mobile devices as well.
 
+## Features
+
+1. System Management:
+   - Add, edit, and remove STEP instance (system) links.
+   - Instantly switch between systems.
+2. API Integrations:
+   - REST API: Ability to run all STEP RESTAPI V2 commands
+   - GraphQL: Execute all GraphQL queries
+   - Console Mode: Custom built click-and-go **quality of life features** combining the best of both APIs.
+3. Monitoring:
+   - Healthchecks: View results of STEP's pre configured tests.
+   - Sensors: Real-time system monitoring via sensors.
+4. Developer Toolkit: 
+   - Utilities for your day-to-day tasks.
+   - Code formatting tools like javascript and xml.
+5. Pro Tips
+   - Best practices, how-to's, and tips & tricks based on my experience.
+6. Responsive UI for both deskto and mobile usage
+
+
+
+## Note
 
 1. #### Privacy & Hosting
 
-- 100% Self-Hosted. You have total control, there is no tracking, telemetry, or "phoning home".
+- This app is meant to be Self-Hosted. You have total control, there is no tracking, telemetry, or "phoning home".
 
 - Data Ownership: As a self-hosted app, the first registered user (Admin) has full visibility into the local database and usage statistics.
 
 2. #### AI Disclosure
 
-- This app is AI-assisted, but not AI made. This means that I took help from AI (Gemini specifically) during development for getting to some answers quicker, but every line of code is reviewed and tested by me. 
+- This app is AI-assisted, but not AI made. This means that I took help from AI (Gemini specifically) during development when I was stuck at some points, but every line of code is reviewed and tested by me, as well as the entire design is made by me.
 
 3. #### License
 
 - Licensed under GPLv3. Use it, modify it, and share it—just remember that any distributed derivative works must also be open-sourced under the same terms.
 
 
-## Features
-
-1.   **System Management**: Configure and switch between multiple STEP systems.
-2.   **API Integartions**:
-    *   **REST API**: Ability to run all STEP RESTAPI V2 commands
-    *   **GraphQL**: Execute any GraphQL query
-    *   **Console Mode**: Custom built click-and-go **quality of life features** combining the best of both APIs.
-3.   **Monitoring**:
-    *   **Healthchecks**: View results of STEP's pre configured tests.
-    *   **Sensors**: Real-time system monitoring via sensors.
-4.   **Developer Toolkit**: Utilities for your day-to-day tasks.
-5.   **Pro Tips**: Best practices, how-to's, and tips & tricks based on experience.
-
 <br>
 
-```
-Demo Instance:
+
+## Demo Instance:
+>If you want to see for yourself how it works, check out the below link and credentials. Just remember to not add your own system credentials on there as others can also see it.
 - URL - https://sage.sabino.in
 - Username - demo
 - Password - demodemo
-```
+
 
 <br>
 
@@ -107,7 +116,7 @@ Demo Instance:
 6. **Set up a secret key:**
   Create a `.env` file in the root directory and set:
    ```
-   SECRET_KEY=your-super-secret-key
+   SECRET_KEY=<your-secret-key>
    ```
    *Tip: Generate a strong key with `python3 -c "import uuid; print(uuid.uuid4().hex)"` or by bashing your head on the keyboard*
 
@@ -139,7 +148,7 @@ Demo Instance:
       docker run -d --name sage -p 3110:3110 -e SECRET_KEY=<secret-key> -v ./db:/sage/db ghcr.io/sabino-pereira/sage:latest
       ```
 
-      The secret key needs to be generated, it can be anything by make it complex for better security.
+      The secret key needs to be generated, it can be anything, but make it complex for better security.
    4. **If you prefer to use docker-compose**:
       ```
       services:
