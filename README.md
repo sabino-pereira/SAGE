@@ -5,6 +5,7 @@
 
 **SAGE** might be your new best friend if you work with the [Stibo STEP MDM platform](https://www.stibosystems.com/platform). Built to scratch a personal itch within to create something within the Stibo STEP ecosystem, this tool has evolved from a hobby project into a robust tool that can help developers in their daily work. Think of it as a centralized dashboard to manage and monitor multiple Stibo STEP instances. Feedback is always welcome, please open an issue or discussion if you have ideas for improvements.
 
+>This is a personal project and not affiliated or endorsed by Stibo Systems. It's expected that the user knows what they are doing when implementing it.
 
 ## Features
 
