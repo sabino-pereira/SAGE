@@ -59,7 +59,7 @@
 
 ## Screenshots
 <details open>
-<summary>Click to expand</summary>
+<summary>Click here to collapse</summary>
 
 **Homepage**
 ![Homepage](app/static/img/ss-homepage.png)
