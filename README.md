@@ -58,7 +58,7 @@
 <br>
 
 ## Screenshots
-<details>
+<details open>
 <summary>Click to expand</summary>
 
 **Homepage**
